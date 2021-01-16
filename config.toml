@@ -1,0 +1,5 @@
+baseURL = "https://blog.jdscript.com/"
+languageCode = "en-us"
+title = "我的简单博客"
+theme = "book"
+
