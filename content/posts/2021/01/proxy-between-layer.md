@@ -1,5 +1,5 @@
 ---
-author: "jd"
+author: "jdlau"
 date: 2021-01-17
 linktitle: proxy between layers
 menu:
@@ -9,7 +9,7 @@ title: proxy between layers
 weight: 10
 ---
 
-层间代理
+## 层间代理
 
 假设有store，从数据库获取数据，其中有方法IUserStore.GetByID，传入id参数，返回用户信息:
 
@@ -75,6 +75,6 @@ func Around(f func(args []interface{}) []interface{}, args []interface{}) []inte
 
 这只是一个简单的包装函数，怎么能将它与上面的接口联系到一起呢？
 
-[有兴趣的话，可以看这里的实现](https://github.com/donnol/tools/blob/master/inject/proxy.go)
+## [有兴趣的话，可以看这里的实现](https://github.com/donnol/tools/blob/master/inject/proxy.go)
 
-[这里的示例](https://github.com/donnol/tools/blob/master/inject/proxy_test.go)
+## [这里的示例](https://github.com/donnol/tools/blob/master/inject/proxy_test.go)

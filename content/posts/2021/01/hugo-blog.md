@@ -1,5 +1,5 @@
 ---
-author: "jd"
+author: "jdlau"
 date: 2021-01-17
 linktitle: hugo搭建博客
 menu:
