@@ -1,15 +1,17 @@
 ---
 author: "jdlau"
 date: 2021-01-17
-linktitle: proxy between layers
+linktitle: go实现AOP
 menu:
 next: 
 prev: 
-title: proxy between layers
+title: go实现AOP
 weight: 10
+categories: ['go']
+tags: ['aop']
 ---
 
-## 层间代理
+## go实现AOP
 
 假设有store，从数据库获取数据，其中有方法IUserStore.GetByID，传入id参数，返回用户信息:
 
@@ -77,4 +79,22 @@ func Around(f func(args []interface{}) []interface{}, args []interface{}) []inte
 
 ## [有兴趣的话，可以看这里的实现](https://github.com/donnol/tools/blob/master/inject/proxy.go)
 
+可以看到，主要的方法是`Around(provider interface{}, mock interface{}, arounder Arounder) interface{}`，
+其中provider参数是类似`NewXXX() IXXX`的函数，而mock是IXXX接口的一个实现，最后的Arounder是
+拥有方法`Around(pctx ProxyContext, method reflect.Value, args []reflect.Value) []reflect.Value`的接口。
+
+
+
 ## [这里的示例](https://github.com/donnol/tools/blob/master/inject/proxy_test.go)
+
+可以看到，mock结构是长这样的：
+
+```go
+type UserMock struct {
+	AddFunc        func(name string) int
+	GetHelper      func(id int) string `method:"Get"` // 表示这个字段关联的方法是Get
+	GetContextFunc func(ctx context.Context, id int) string
+}
+```
+
+所以，为了提升开发效率，我还写了一个[工具](https://github.com/donnol/tools)，用来根据接口生成相应的mock结构体。
