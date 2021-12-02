@@ -24,11 +24,6 @@ disqusShortname = "donno272"
 
 [menu]
 [[menu.after]]
-  name = "About me"
-  url = "/posts/aboutme/content"
-  weight = 5
-
-[[menu.after]]
   name = "Github"
   url = "https://github.com/donnol/blog"
   weight = 10
