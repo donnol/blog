@@ -25,7 +25,7 @@ disqusShortname = "donno272"
 [menu]
 [[menu.after]]
   name = "About me"
-  url = "/posts/2021/12/etcd"
+  url = "/posts/aboutme/content"
   weight = 5
 
 [[menu.after]]
