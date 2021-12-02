@@ -2,6 +2,40 @@
 
 ## raft
 
+### [介绍](https://pkg.go.dev/go.etcd.io/etcd/raft/v3#section-readme)
+
+> 由多个节点组成的集群维护着一个可复制状态机的协议。通过复制日志来保持状态机的同步。[可理解的共识算法](https://raft.github.io/raft.pdf)
+>
+> 状态机以消息为输入。消息可以是一个本地定时器更新，或一条网络消息。输出一个3元结构：`[]Messages, []LogEntries, NextState`，分别是消息列表、日志条目列表、下个状态。同样状态的状态机，在相同输入时总是输出相同结果。
+
+### 插曲
+
+人、联系、共识
+
+人生下来，触摸着这个世界的人和物，做着或有趣或无聊的事，建立起或浅或深的联系。
+
+当两个人面对面时，就某个想法达成一致或不一致，非常容易。
+
+如果两个人不是面对面呢？
+
+如果不只两个人，同坐在祠堂里呢？
+
+如果不止两个人，还分散在不同地点呢？
+
+那么，为什么要达成共识呢？
+
+因为有些事必须达成共识才能执行，比如，两个人双向奔赴。
+
+如果彼此异心，一个向东，一个往南，事情就办不成了。
+
+所以，共识是大伙成事的前提。
+
+共识，除了就某件事所要达成的结果，也要考虑所使用的方法。
+
+有可能是步步为营，走一步算一步，也就是每走一步再就下一步达成共识。
+
+也有可能是，一次性就接下来的几步均达成共识，然后各自执行。
+
 ### message type
 
 ```go
@@ -67,6 +101,48 @@ const (
 	MsgPreVote        MessageType = 17
 	MsgPreVoteResp    MessageType = 18
 )
+```
+
+### raft, Node and RawNode
+
+```go
+type Node interface {
+    // ...
+}
+
+func StartNode(...) Node {
+    rn, err := NewRawNode(...)
+	if err != nil {
+		panic(err)
+	}
+
+    n := newNode(rn)
+    go n.run()
+    return &n
+}
+
+func NewRawNode(config *Config) (*RawNode, error) {
+    r := newRaft(config)
+    rn := &RawNode{
+        raft: r,
+    }
+
+    ...
+
+    return rn, nil
+}
+
+type node struct { // impl Node interface
+    ...
+
+    rn *RawNode
+}
+
+func newNode(rn *RawNode) node {
+    return node{
+        ...
+    }
+}
 ```
 
 ## 实现
