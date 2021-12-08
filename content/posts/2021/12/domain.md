@@ -9,6 +9,14 @@ title: Domain-oriented development
 weight: 10
 ---
 
+面向领域开发。
+
+将业务复杂度和技术复杂度分开，逐个击破。
+
+分离领域，各司其职。
+
+降低复杂度，容易测试。
+
 ## DDD 尝试
 
 order.go:
