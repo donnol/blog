@@ -9,7 +9,8 @@ import (
 
 // 关键词：用户、店铺、商品、订单
 //
-// 场景描述：店铺展示商品，其价格为P、库存为N，用户（余额为Y）看到商品觉得合适，于是下单购买B个；购买前，用户余额Y必须不小于P，商品库存N不小于B；购买后，用户余额减少P，库存减少B；
+// 场景描述：店铺展示商品，其价格为P、库存为N，用户（余额为Y）看到商品觉得合适，于是下单购买B个；
+// 购买前，用户余额Y必须不小于P，商品库存N不小于B；购买后，用户余额减少P，库存减少B；
 //
 // 先不考虑并发情况，建立此时的领域模型
 
@@ -110,7 +111,9 @@ func (o *Order) Product() *Product {
 
 // GenerateRandomString 随机字符串包含有数字和大小写字母
 func GenerateRandomString(n int) (string, error) {
-	const letters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+	const (
+		letters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+	)
 
 	return generate(n, letters)
 }

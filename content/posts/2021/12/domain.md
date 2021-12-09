@@ -135,7 +135,9 @@ func (o *Order) Product() *Product {
 
 // GenerateRandomString 随机字符串包含有数字和大小写字母
 func GenerateRandomString(n int) (string, error) {
- const letters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+ const (
+  letters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+ )
 
  return generate(n, letters)
 }
@@ -162,7 +164,7 @@ package domain_test
 import (
  "testing"
 
- "github.com/donnol/bcwallet/domain"
+ "github.com/donnol/blog/demo/go/domain"
 )
 
 func TestNewOrder(t *testing.T) {
@@ -177,16 +179,19 @@ func TestNewOrder(t *testing.T) {
   want *domain.Order
  }{
   {name: "", args: args{
-   user:    domain.NewUser("jd", "123", 10000),
+   user: domain.NewUser("jd", "123", 10000),
    product: domain.NewProduct("树莓派", 1000, 10,
     domain.NewShop("a shop", "zhongshan")),
-   c:       1,
+   c: 1,
   }, want: nil},
  }
  for _, tt := range tests {
   t.Run(tt.name, func(t *testing.T) {
-   if got := domain.NewOrder(tt.args.user, tt.args.product, tt.args.c);
-    got.User().Balance() != 9000 || got.Product().Stock() != 9 {
+   if got := domain.NewOrder(
+    tt.args.user,
+    tt.args.product,
+    tt.args.c,
+   ); got.User().Balance() != 9000 || got.Product().Stock() != 9 {
     t.Logf("user: %+v, product: %+v\n", got.User(), got.Product())
     t.Errorf("NewOrder() = %v, want %v", got, tt.want)
    }
