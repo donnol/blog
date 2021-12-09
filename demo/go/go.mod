@@ -2,7 +2,10 @@ module github.com/donnol/blog/demo/go
 
 go 1.17
 
-require google.golang.org/grpc v1.42.0
+require (
+	github.com/pkg/errors v0.9.1
+	google.golang.org/grpc v1.42.0
+)
 
 require (
 	github.com/golang/protobuf v1.4.3 // indirect
