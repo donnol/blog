@@ -41,7 +41,7 @@ weight: 10
 
 使用较小的通用组件创建了一个全新的、专用的数据系统。
 
-![组件图](/static/image/数据密集型应用一般涉及的组件.png)
+![组件图](/image/数据密集型应用一般涉及的组件.png)
 
 ### 如何衡量一个系统的好坏
 
@@ -74,7 +74,7 @@ weight: 10
 
 > 一种用于实现跨多个节点的原子事务提交的算法，即确保所有节点提交或所有节点中止。
 
-![2PC](/static/image/2PC.png)
+![2PC](/image/2PC.png)
 
 > 2PC 使用一个通常不会出现在单节点事务中的新组件：协调者（coordinator）（也称为事务管理器（transaction manager））。
 >
@@ -90,7 +90,7 @@ weight: 10
 
 > 在两阶段提交的情况下，准备(prepare 阶段)请求和提交(commit 阶段)请求当然也可以轻易丢失。 2PC 又有什么不同呢？
 
-![2PC](/static/image/2PC完整流程.png)
+![2PC](/image/2PC完整流程.png)
 
 ## 第十一章 流处理
 
