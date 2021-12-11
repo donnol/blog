@@ -384,14 +384,14 @@ kubeadm join 192.168.9.43:6443 --token abcdef.0123456789abcdef \
 > 编辑配置：修改
 >
 > net-conf.json: |
-
-{
-"Network": "10.46.128.0/21", # 这个地址要与 kubeadm 指定的配置文件里的 podSubnet 里的 ip 一致
-"Backend": {
-"Type": "vxlan"
-}
-}
-
+>
+> {
+> "Network": "10.46.128.0/21", # 这个地址要与 kubeadm 指定的配置文件里的 podSubnet 里的 ip 一致
+> "Backend": {
+> "Type": "vxlan"
+> }
+> }
+>
 > 最后执行命令: `kubectl apply -f kube-flannel.yml`
 
 最后，查看 pods 状态：`kubectl get pods --all-namespaces`
