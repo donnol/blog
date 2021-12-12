@@ -9,6 +9,8 @@ title: docker compose使用extra host让容器访问主机服务
 weight: 10
 ---
 
+[首发于：简单博客](/posts/2021/12/docker_compose_extra_host/)
+
 ## docker compose 如何访问主机服务
 
 docker compose 里面的容器怎么访问主机自身起的服务呢？
