@@ -1,1 +1,3 @@
 workspace.code-workspace
+demo/rust/mybin/target
+demo/rust/mylib/target
