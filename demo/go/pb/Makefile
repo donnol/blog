@@ -11,11 +11,8 @@ install_protoc-gen-go:
 install_protoc-gen-go-grpc:
 	go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
 
-# protoc -I. \
-# 	--go_out=plugins=grpc,paths=source_relative:./ \
-# 	./*.proto
+# --go-grpc_out=. \
+# --go-grpc_opt=paths=source_relative
 genproto:
-	protoc --go_out=plugins=grpc:. --go_opt=paths=source_relative:. \
-    	--go-grpc_out=. \
-		--go-grpc_opt=paths=source_relative:. \
+	protoc --go_out=plugins=grpc:. --go_opt=paths=source_relative \
     	./*.proto
