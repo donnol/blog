@@ -7,6 +7,8 @@ next:
 prev:
 title: vscode-go在go.mod在非根目录情况下失效的问题
 weight: 10
+categories: ['vscode-go']
+tags: ['gomod']
 ---
 
 问题如图：

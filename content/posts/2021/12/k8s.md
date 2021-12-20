@@ -7,6 +7,8 @@ next:
 prev:
 title: k8s
 weight: 10
+categories: ['k8s']
+tags: ['k8s']
 ---
 
 ## What

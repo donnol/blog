@@ -7,6 +7,8 @@ next:
 prev:
 title: burn cpu use golang
 weight: 10
+categories: ['go']
+tags: ['cpu']
 ---
 
 ## 虚假的 burn

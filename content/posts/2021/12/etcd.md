@@ -1,3 +1,16 @@
+---
+author: "jdlau"
+date: 2021-12-20
+linktitle: etcd
+menu:
+next:
+prev:
+title: etcd
+weight: 10
+categories: ['etcd']
+tags: ['raft']
+---
+
 # etcd
 
 ## raft

@@ -7,8 +7,8 @@ next:
 prev: 
 title: go ctx
 weight: 10
-categories: ['ctx']
-tags: ['go']
+categories: ['go']
+tags: ['ctx']
 ---
 
 ## ctx

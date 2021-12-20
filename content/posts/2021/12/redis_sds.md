@@ -7,6 +7,8 @@ next:
 prev:
 title: redis sds
 weight: 10
+categories: ['redis']
+tags: ['sds']
 ---
 
 ## 简单动态字符串

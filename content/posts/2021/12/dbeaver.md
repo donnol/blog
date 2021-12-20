@@ -7,6 +7,8 @@ next:
 prev:
 title: 数据库管理工具之dbeaver
 weight: 10
+categories: ['dbmanager']
+tags: ['dbeaver']
 ---
 
 [dbeaver: github](https://github.com/dbeaver/dbeaver)

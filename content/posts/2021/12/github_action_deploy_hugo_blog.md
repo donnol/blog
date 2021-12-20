@@ -7,6 +7,8 @@ next:
 prev: 
 title: github action deploy hugo blog
 weight: 10
+categories: ['blog']
+tags: ['deploy']
 ---
 
 ## why

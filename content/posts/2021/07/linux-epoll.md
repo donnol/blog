@@ -1,3 +1,16 @@
+---
+author: "jdlau"
+date: 2021-07-17
+linktitle: linux epoll
+menu:
+next: 
+prev: 
+title: linux epoll
+weight: 10
+categories: ['linux']
+tags: ['epoll']
+---
+
 # linux epoll
 
 [wiki](https://zh.wikipedia.org/wiki/Epoll)

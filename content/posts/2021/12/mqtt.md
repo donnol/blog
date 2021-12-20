@@ -7,6 +7,8 @@ next: /posts/2021/12/redis_sds/
 prev: /posts/2021/12/k8s/
 title: mqtt
 weight: 10
+categories: ['message queue']
+tags: ['mqtt']
 ---
 
 ## 物联网消息标准

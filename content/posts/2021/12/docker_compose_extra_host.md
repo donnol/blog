@@ -7,6 +7,8 @@ next:
 prev:
 title: docker compose使用extra host让容器访问主机服务
 weight: 10
+categories: ['docker']
+tags: ['compose']
 ---
 
 [首发于：简单博客](/posts/2021/12/docker_compose_extra_host/)

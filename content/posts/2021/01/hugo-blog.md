@@ -7,6 +7,8 @@ next:
 prev: 
 title: hugo搭建博客
 weight: 10
+categories: ['blog']
+tags: ['hugo']
 ---
 
 ## 操作

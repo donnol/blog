@@ -7,6 +7,8 @@ next:
 prev:
 title: 数据密集型应用设计
 weight: 10
+categories: ['book']
+tags: ['ddia']
 ---
 
 ## 第一章 可靠性、可扩展性、可维护性

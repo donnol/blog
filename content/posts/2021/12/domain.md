@@ -7,6 +7,8 @@ next:
 prev:
 title: Domain-oriented development
 weight: 10
+categories: ['ddd']
+tags: ['domain']
 ---
 
 面向领域开发。
