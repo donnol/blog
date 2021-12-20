@@ -14,7 +14,7 @@ int main(int *argc, char *argv)
     // 2 先转再加
     s = (char *)sh;
     s += hdrlen;
-    printf("s: %p\n", s);
+    printf("s: %p\n", s); // 0000000000001008
 
     // 3 先加再转
     void *t = sh + hdrlen;
