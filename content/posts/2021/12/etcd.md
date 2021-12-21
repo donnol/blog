@@ -161,3 +161,11 @@ func newNode(rn *RawNode) node {
 ## 实现
 
 ## 使用
+
+## 存储
+
+[bbolt](go.etcd.io/bbolt)
+
+## 传输
+
+[grpc](google.golang.org/grpc)
