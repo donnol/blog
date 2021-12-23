@@ -2,6 +2,8 @@ package com.jdscript.spring;
 
 import javax.annotation.PostConstruct;
 
+import com.jdscript.spring.owor.Or;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -21,6 +23,9 @@ public class MyspringApplication {
 	}
 
 	public static void main(String[] args) {
+		Or or = new Or();
+		System.out.println(or);
+
 		SpringApplication.run(MyspringApplication.class, args);
 	}
 
