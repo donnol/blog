@@ -14,6 +14,7 @@ import (
 //
 // 先不考虑并发情况，建立此时的领域模型
 
+// domain中的User不一定就需要User本身所有的数据，所以另外按需定义结构体
 type User struct {
 	name  string // 名称
 	phone string // 电话
@@ -84,6 +85,12 @@ func (p *Product) DeductStock(c int) {
 	p.stock -= c
 }
 
+func (p *Product) SetShopIfNil(shop *Shop) {
+	if p.ownShop == nil && shop != nil {
+		p.ownShop = shop
+	}
+}
+
 // NewOrder 用户对商品下单c个
 func NewOrder(user *User, product *Product, c int) *Order {
 	name, err := GenerateRandomString(12)
@@ -99,6 +106,10 @@ func NewOrder(user *User, product *Product, c int) *Order {
 		user:    user,
 		product: product,
 	}
+}
+
+func (o *Order) Name() string {
+	return o.name
 }
 
 func (o *Order) User() *User {

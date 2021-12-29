@@ -3,7 +3,7 @@ package domain_test
 import (
 	"testing"
 
-	"github.com/donnol/blog/demo/go/domain"
+	"github.com/donnol/blog/demo/go/ddd/domain"
 )
 
 func TestNewOrder(t *testing.T) {
