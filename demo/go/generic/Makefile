@@ -5,4 +5,4 @@
 # ./append.go:4:2: embedding interface element string|[]byte requires go1.18 or later (-lang was set to go1.17; check go.mod)
 # ./append.go:8:23: type parameters require go1.18 or later
 build:
-	GO111MODULE=off gotip  build
+	GO111MODULE=off gotip build
