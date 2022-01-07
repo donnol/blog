@@ -59,6 +59,118 @@ tags: ['ebpf']
 
 ## 使用
 
+先用`man bpf`看下它是怎么被定义的：
+
+```c
+NAME
+    bpf - perform a command on an extended BPF map or program
+	-- 在bpf map或程序里执行一个命令
+
+SYNOPSIS
+    #include <linux/bpf.h>
+
+    int bpf(int cmd, union bpf_attr *attr, unsigned int size);
+	-- bpf_attr里有些什么呢？
+
+DESCRIPTION
+    The  bpf() system call performs a range of operations related to extended Berkeley Packet
+    Filters.  Extended BPF (or eBPF) is similar to the original ("classic") BPF  (cBPF)  used
+    to  filter  network packets.  For both cBPF and eBPF programs, the kernel statically ana‐
+    lyzes the programs before loading them, in order to ensure that they cannot harm the run‐
+    ning system.
+	-- 在程序被加载之前分析它，确保它们不会伤害到运行中的系统。
+
+    eBPF  extends cBPF in multiple ways, including the ability to call a fixed set of in-ker‐
+    nel helper functions (via the BPF_CALL opcode extension  provided  by  eBPF)  and  access
+    shared data structures such as eBPF maps.
+	-- ebpf在很多方面扩展了cbpf，包括可以调用固定的钩子函数的能力，可以访问共享的数据结构（如：ebpf maps）。
+
+Extended BPF Design/Architecture
+	eBPF  maps  are a generic data structure for storage of different data types.  Data types
+	are generally treated as binary blobs, so a user just specifies the size of the  key  and
+	the  size of the value at map-creation time.  In other words, a key/value for a given map
+	can have an arbitrary structure.
+
+	A user process can create multiple maps (with key/value-pairs being opaque bytes of data)
+	and  access  them via file descriptors.  Different eBPF programs can access the same maps
+	in parallel.  It's up to the user process and eBPF program to decide what they store  in‐
+	side maps.
+	-- 一个用户进程可以创建多个maps，然后通过文件描述符访问它们。不同的ebpf程序可以并行访问同一个maps。由用户进程和ebpf程序决定存储内容。
+
+	There's  one  special map type, called a program array.  This type of map stores file de‐
+	scriptors referring to other eBPF programs.  When a lookup in the map is  performed,  the
+	program flow is redirected in-place to the beginning of another eBPF program and does not
+	return back to the calling program.  The level of nesting has a fixed  limit  of  32,  so
+	that  infinite loops cannot be crafted.  At run time, the program file descriptors stored
+	in the map can be modified, so program functionality can be altered based on specific re‐
+	quirements.   All  programs  referred to in a program-array map must have been previously
+	loaded into the kernel via bpf().  If a map lookup fails, the current  program  continues
+	its execution.  See BPF_MAP_TYPE_PROG_ARRAY below for further details.
+	-- 有一类特殊的map类型，称为程序数组。这种类型的map存储指向其它ebpf程序的文件描述符。当在map里执行lookup时，程序流被重定向到另外的ebpf程序的开头，并且不会返回到当前的ebpf程序（调走之后就不回来了）。内嵌的最大层数限制为32，因此不会出现无限循环。在运行时，程序储存在map的文件描述符可以被修改，因此可以根据特定要求更改程序功能。在这种程序数组map里的程序必须在之前已经用bpf()加载了进来。如果lookup失败了，当前程序会继续执行。
+
+	Generally,  eBPF  programs are loaded by the user process and automatically unloaded when
+	the process exits.  In some cases, for example, tc-bpf(8), the program will  continue  to
+	stay  alive  inside  the kernel even after the process that loaded the program exits.  In
+	that case, the tc subsystem holds a reference to the eBPF program after the file descrip‐
+	tor  has been closed by the user-space program.  Thus, whether a specific program contin‐
+	ues to live inside the kernel depends on how it is further attached  to  a  given  kernel
+	subsystem after it was loaded via bpf().
+	-- 一般地，ebpf程序被用户进程加载，并随用户进程离开而自动卸载。不过有些特别的例子，比如：tc-bpf，它在加载它的程序退出之后还会继续存活。tc子系统会持有该ebpf程序的引用。
+
+	Each  eBPF program is a set of instructions that is safe to run until its completion.  An
+	in-kernel verifier statically determines that the eBPF program terminates and is safe  to
+	execute.   During  verification,  the  kernel increments reference counts for each of the
+	maps that the eBPF program uses, so that the attached maps can't  be  removed  until  the
+	program is unloaded.
+	-- 每个ebpf程序都是一个指令集合，安全地执行直到完成。在程序验证期间，内核增加ebpf使用的每个map的引用计数，使得map不会被移除直到程序被卸载。
+
+	eBPF  programs  can  be attached to different events.  These events can be the arrival of
+	network packets, tracing events, classification events by network  queueing   disciplines
+	(for  eBPF programs attached to a tc(8) classifier), and other types that may be added in
+	the future.  A new event triggers execution of the eBPF program, which may store informa‐
+	tion  about  the event in eBPF maps.  Beyond storing data, eBPF programs may call a fixed
+	set of in-kernel helper functions.
+	-- ebpf程序可以附加到不同的事件上。这些事件可以是网络包到达，事件追踪，按网络排队规则对事件进行分类，和其它未来将被加进来的事件。一个新的事件触发ebpf程序的执行，可以存储事件的信息到ebpf maps里。除了存储数据之外，ebpf程序可以调用一系列固定的内核钩子函数。
+```
+
+```c
+// union 多选一
+union bpf_attr {
+	struct {    /* Used by BPF_MAP_CREATE */
+		__u32         map_type;
+		__u32         key_size;    /* size of key in bytes */
+		__u32         value_size;  /* size of value in bytes */
+		__u32         max_entries; /* maximum number of entries
+										in a map */
+	};
+
+	struct {    /* Used by BPF_MAP_*_ELEM and BPF_MAP_GET_NEXT_KEY
+					commands */
+		__u32         map_fd;
+		__aligned_u64 key;
+		union {
+			__aligned_u64 value;
+			__aligned_u64 next_key;
+		};
+		__u64         flags;
+	};
+
+	struct {    /* Used by BPF_PROG_LOAD */
+		__u32         prog_type;
+		__u32         insn_cnt;
+		__aligned_u64 insns;      /* 'const struct bpf_insn *' */
+		__aligned_u64 license;    /* 'const char *' */
+		__u32         log_level;  /* verbosity level of verifier */
+		__u32         log_size;   /* size of user buffer */
+		__aligned_u64 log_buf;    /* user supplied 'char *'
+									buffer */
+		__u32         kern_version;
+									/* checked when prog_type=kprobe
+									(since Linux 4.1) */
+	};
+} __attribute__((aligned(8)));
+```
+
 一个 BPF 程序，如果它通过验证，就会被加载到内核中。在那里，它将被 JIT 编译器**编译成机器码**，并在内核模式下运行，这时附加的触发器将会被激活。
 
 ```sh
@@ -79,6 +191,7 @@ BCC 允许你用 Python 编写这一部分，而 Python 是该工具的主要语
 
 除了 iovisor/gobpf 之外，我还发现了其他三个最新的项目，它们允许你在 Go 中编写用户空间（userland）部分。
 
+- https://github.com/golang/net/tree/master/bpf
 - https://github.com/dropbox/goebpf
 - https://github.com/cilium/ebpf
 - https://github.com/andrewkroh/go-ebpf
