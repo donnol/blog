@@ -85,3 +85,28 @@ examples:
 #### 监控
 
 #### 反馈
+
+## android开发入门
+
+1. [下载studio](https://developer.android.com/studio/)
+
+2. 解压
+
+3. 安装：`bash ./bin/studio.sh`；下载依赖时需要设置代理。
+
+4. 新建项目，除了修改项目路径，其余使用默认设置。
+
+studio加载项目的时候因为要下依赖，速度非常之慢，尝试修改配置`build.gradle`：
+
+```gradle
+    repositories {
+        maven{ url 'https://maven.aliyun.com/repository/central' }
+        maven{ url 'https://maven.aliyun.com/repository/public' }
+        maven{ url 'https://maven.aliyun.com/repository/gradle-plugin'}
+        maven{ url 'https://maven.aliyun.com/repository/grails-core'}
+    }
+```
+
+在加载模拟器的时候，因为用的是虚拟机，需要开启虚拟机CPU的`VT-x`特性。
+
+在虚拟机配置里开启了该特性之后，又报错：`此平台不支持虚拟化的 Intel VT-x/EPT`，暂时先不管它。
