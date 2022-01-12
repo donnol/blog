@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+
+<!-- 引入本地文件使用的是file协议，导致跨域问题：https://cloud.tencent.com/developer/article/1534714 -->
+<!-- <script type="module" src="./index.js" defer="defer"></script> -->
+
+<script type="text/javascript" src="./index.js" defer="defer"></script>
+
+<header>
+    <meta charset="utf-8">
+    <title>wall</title>
+    <link rel="stylesheet" href="index.css">
+</header>
+
+<body>
+    <div class="parent">
+        字母列表1
+        <ol lang="zh">
+            <li id="ele">
+                a
+            </li>
+            <li id="ele" onclick="bFunction()">
+                b
+            </li>
+            <li id="ele" onclick="printName()">
+                c
+            </li>
+        </ol>
+    </div>
+</body>
+
+<script>
+    function bFunction() {
+        console.log("b")
+    }
+</script>
+
+</html>

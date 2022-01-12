@@ -1,0 +1,11 @@
+.parent{
+    background-color: brown;
+    text-decoration-color: red;
+    text-align: center;
+}
+#ele{
+    background-color: black;
+    text-align: left;
+    color: green;
+    margin: 100px;
+}

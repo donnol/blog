@@ -3,3 +3,4 @@ demo/c/a.out
 demo/c/jmp/jmp
 demo/rust/mybin/target
 demo/rust/mylib/target
+node_modules
