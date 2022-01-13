@@ -14,15 +14,17 @@
 
 <body>
     <div class="parent">
-        字母列表1
+        字母列表
         <ol lang="zh">
-            <li id="ele">
+            <li id="ele0" class="ele">
                 a
             </li>
-            <li id="ele" onclick="bFunction()">
+            <!-- 在调用函数之后，怎么修改展示的内容呢？ -->
+            <!-- 先定义一个唯一id，然后再用js在函数里根据id拿到元素，然后对其做出修改 -->
+            <li id="ele1" class="ele" onclick="bFunction()"> 
                 b
             </li>
-            <li id="ele" onclick="printName()">
+            <li id="ele2" class="ele" onclick="printName()">
                 c
             </li>
         </ol>
@@ -32,6 +34,9 @@
 <script>
     function bFunction() {
         console.log("b")
+
+        // 修改元素的内容
+        document.getElementById("ele1").innerText = "bb"
     }
 </script>
 

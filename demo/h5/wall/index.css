@@ -1,11 +1,21 @@
+/* 通过class来配置共用样式 */
+
 .parent{
-    background-color: brown;
+    background-color: white;
     text-decoration-color: red;
     text-align: center;
 }
-#ele{
-    background-color: black;
+.ele{
+    background-color: gold;
     text-align: left;
     color: green;
-    margin: 100px;
+    margin: 10px;
+    padding: 10px;
+}
+
+/* 通过id来配置特定样式 */
+
+#ele1{
+    background-color: blueviolet;
+    color: aqua;
 }
