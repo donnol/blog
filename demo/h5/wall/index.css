@@ -1,21 +1,50 @@
 /* 通过class来配置共用样式 */
 
-.parent{
-    background-color: white;
-    text-decoration-color: red;
+.header{
+    background-color: aquamarine;
     text-align: center;
 }
+.parent{
+    /* 布局 */
+    display: flex;
+    /* vw = view width */
+    /* vh = view height */
+    /* 这两个单位是CSS3引入的，以上称为视口单位允许我们更接近浏览器窗口定义大小 */
+    /* 1vw = 视口宽度的1%; 1vh = 视口高度的1%; %依赖元素的祖先元素; vw/vh依赖视口的尺寸 */
+    min-height: 100vh;
+    flex-direction: row;
+
+    background-color: white;
+    text-align: center;
+}
+.list{
+    width: 33%;
+
+    background-color: rgb(153, 156, 156);
+    border-radius: 10px;
+    margin: 10px;
+    padding: 10px;
+}
 .ele{
+    width: 80%;
+
     background-color: gold;
     text-align: left;
     color: green;
     margin: 10px;
     padding: 10px;
+
+    /* 圆角 */
+    border-radius: 10px;
+}
+.footer{
+    background-color: rgb(148, 160, 156);
+    text-align: center;
 }
 
 /* 通过id来配置特定样式 */
 
-#ele1{
+#alpha-ele1{
     background-color: blueviolet;
     color: aqua;
 }

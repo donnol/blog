@@ -13,30 +13,64 @@
 </header>
 
 <body>
-    <div class="parent">
-        字母列表
-        <ol lang="zh">
-            <li id="ele0" class="ele">
-                a
-            </li>
-            <!-- 在调用函数之后，怎么修改展示的内容呢？ -->
-            <!-- 先定义一个唯一id，然后再用js在函数里根据id拿到元素，然后对其做出修改 -->
-            <li id="ele1" class="ele" onclick="bFunction()"> 
-                b
-            </li>
-            <li id="ele2" class="ele" onclick="printName()">
-                c
-            </li>
-        </ol>
+    <div class="header">
+        三个独立列表
     </div>
+    <div class="parent">
+        <div class="list" id="alpha">
+            字母列表
+            <ol lang="zh">
+                <li id="alpha-ele0" class="ele">
+                    a
+                </li>
+                <li id="alpha-ele1" class="ele" onclick="bFunction()">
+                    b
+                </li>
+                <li id="alpha-ele2" class="ele" onclick="printName()">
+                    c
+                </li>
+            </ol>
+        </div>
+        <div class="list" id="number">
+            数字列表
+            <ol lang="zh">
+                <li id="number-ele0" class="ele">
+                    1
+                </li>
+                <li id="number-ele1" class="ele" onclick="bFunction()">
+                    2
+                </li>
+                <li id="number-ele2" class="ele" onclick="printName()">
+                    3
+                </li>
+            </ol>
+        </div>
+        <div class="list" id="last-name">
+            姓氏列表
+            <ol lang="zh">
+                <li id="last-name-ele0" class="ele">
+                    赵
+                </li>
+                <li id="last-name-ele1" class="ele" onclick="bFunction()">
+                    钱
+                </li>
+                <li id="last-name-ele2" class="ele" onclick="printName()">
+                    孙
+                </li>
+            </ol>
+        </div>
+    </div>
+    <div class="footer">感谢所有人的支持</div>
 </body>
 
 <script>
+    // 在调用函数之后，怎么修改展示的内容呢？
+    // 先定义一个唯一id，然后再用js在函数里根据id拿到元素，然后对其做出修改
     function bFunction() {
         console.log("b")
 
-        // 修改元素的内容
-        document.getElementById("ele1").innerText = "bb"
+        // 修改元素的内容--id变了，这里也要跟着变
+        document.getElementById("alpha-ele1").innerText = "bb"
     }
 </script>
 
