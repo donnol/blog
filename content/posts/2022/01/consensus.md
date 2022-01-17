@@ -77,3 +77,52 @@ draft: true
 > 一些航天飞机的飞行系统甚至将容错功能放到整个系统的设计之中。
 >
 > 拜占庭容错机制是将收到的消息（或是收到的消息的签名）转交到其他的接收者。这类机制都假设它们转交的消息都可能念有拜占庭问题。在高度安全要求的系统中，这些假设甚至要求证明**错误能在一个合理的等级下被排除**。当然，要证明这点，首先遇到的问题就是如何有效的找出所有可能的、应能被容错的错误。这时候会试着在系统中加入错误插入器。 
+
+### eth共识
+
+#### Beacon
+
+Beacon：信标
+
+eth2将要升级的共识机制，即将使用的基于eth1和PoS算法的共识。
+
+信标链不支持叔块了。
+
+信标链和经典链在校验header时的不同：
+
+>(a) The following fields are expected to be constants:
+> - difficulty is expected to be 0 -- 难度固定为0
+> - nonce is expected to be 0 -- 随机数固定为0
+> - unclehash is expected to be Hash(emptyHeader)
+> to be the desired constants -- 叔块哈希固定为空值
+>
+>(b) the timestamp is not verified anymore
+>(c) the extradata is limited to 32 bytes
+
+切换点：`TerminalTotalDifficulty is the amount of total difficulty reached by the network that triggers the consensus upgrade.`
+
+[eth2升级](https://ethereum.org/zh/eth2/)
+
+引入质押
+
+计算当前块的basefee:
+
+> If the parent gasUsed is the same as the target, the baseFee remains unchanged.
+> 
+> If the parent block used more gas than its target, the baseFee should increase.
+>
+> Otherwise if the parent block used less gas than its target, the baseFee should decrease.
+
+其中，target：`parentGasTarget = parent.GasLimit / params.ElasticityMultiplier`，**params.ElasticityMultiplier**是常量，值为2.
+
+具体计算过程在`consensus/misc/eip1559.go`的`CalcBaseFee`函数里。
+
+#### PoW
+
+`consensus/ethash`
+
+未来15秒以内的块都算是正常的块，每个快最多2个叔块。
+
+#### PoA
+
+`consensus/clique`
