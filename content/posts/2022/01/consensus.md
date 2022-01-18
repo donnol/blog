@@ -121,8 +121,153 @@ eth2将要升级的共识机制，即将使用的基于eth1和PoS算法的共识
 
 `consensus/ethash`
 
-未来15秒以内的块都算是正常的块，每个快最多2个叔块。
+未来15秒以内的块都算是正常的块，每个块最多2个叔块。
+
+校验叔块时，获取最近6个高度的块信息，作为检验叔块是否合法的依据。
+
+1.如何挖出一个新块？
+
+`FinalizeAndAssemble`
+
+```go
+// FinalizeAndAssemble implements consensus.Engine, accumulating the block and
+// uncle rewards, setting the final state and assembling the block.
+func (ethash *Ethash) FinalizeAndAssemble(
+    chain consensus.ChainHeaderReader,
+    header *types.Header,
+    state *state.StateDB,
+    txs []*types.Transaction,
+    uncles []*types.Header,
+    receipts []*types.Receipt,
+) (
+    *types.Block,
+    error,
+)
+```
+
+2.如何将这个块上链？
+
+```go
+// Seal generates a new sealing request for the given input block and pushes
+// the result into the given channel.
+//
+// Note, the method returns immediately and will send the result async. More
+// than one result may also be returned depending on the consensus algorithm.
+// 
+// Seal implements consensus.Engine, attempting to find a nonce that satisfies
+// the block's difficulty requirements.
+func (ethash *Ethash) Seal(
+    chain consensus.ChainHeaderReader,
+    block *types.Block,
+    results chan<- *types.Block,
+    stop <-chan struct{},
+) error
+
+// mine is the actual proof-of-work miner that searches for a nonce starting from
+// seed that results in correct final block difficulty.
+func (ethash *Ethash) mine(
+    block *types.Block,
+    id int,
+    seed uint64,
+    abort chan struct{},
+    found chan *types.Block,
+)
+
+// hashimotoFull aggregates data from the full dataset (using the full in-memory
+// dataset) in order to produce our final value for a particular header hash and
+// nonce.
+func hashimotoFull(
+    dataset []uint32,
+    hash []byte,
+    nonce uint64,
+) (
+    digest []byte,
+    result []byte,
+)
+```
+
+先获得一个随机数，然后递增该随机数，直到计算出符合要求的结果。-- 除结果外，还有一个`digest`。
+
+最后将该随机数和`digest`保存到块的header里。
+
+```go
+func (w *worker) resultLoop() {
+	defer w.wg.Done()
+	for {
+		select {
+		case block := <-w.resultCh:
+			// Short circuit when receiving empty result.
+			if block == nil {
+				continue
+			}
+			// Short circuit when receiving duplicate result caused by resubmitting.
+			if w.chain.HasBlock(block.Hash(), block.NumberU64()) {
+				continue
+			}
+			var (
+				sealhash = w.engine.SealHash(block.Header())
+				hash     = block.Hash()
+			)
+			w.pendingMu.RLock()
+			task, exist := w.pendingTasks[sealhash]
+			w.pendingMu.RUnlock()
+			if !exist {
+				log.Error("Block found but no relative pending task", "number", block.Number(), "sealhash", sealhash, "hash", hash)
+				continue
+			}
+			// Different block could share same sealhash, deep copy here to prevent write-write conflict.
+			var (
+				receipts = make([]*types.Receipt, len(task.receipts))
+				logs     []*types.Log
+			)
+			for i, taskReceipt := range task.receipts {
+				receipt := new(types.Receipt)
+				receipts[i] = receipt
+				*receipt = *taskReceipt
+
+				// add block location fields
+				receipt.BlockHash = hash
+				receipt.BlockNumber = block.Number()
+				receipt.TransactionIndex = uint(i)
+
+				// Update the block hash in all logs since it is now available and not when the
+				// receipt/log of individual transactions were created.
+				receipt.Logs = make([]*types.Log, len(taskReceipt.Logs))
+				for i, taskLog := range taskReceipt.Logs {
+					log := new(types.Log)
+					receipt.Logs[i] = log
+					*log = *taskLog
+					log.BlockHash = hash
+				}
+				logs = append(logs, receipt.Logs...)
+			}
+
+            // ===== 提交块，保存状态到数据库 =====
+
+			// Commit block and state to database.
+			_, err := w.chain.WriteBlockAndSetHead(block, receipts, logs, task.state, true)
+			if err != nil {
+				log.Error("Failed writing block to chain", "err", err)
+				continue
+			}
+			log.Info("Successfully sealed new block", "number", block.Number(), "sealhash", sealhash, "hash", hash,
+				"elapsed", common.PrettyDuration(time.Since(task.createdAt)))
+
+			// Broadcast the block and announce chain insertion event
+			w.mux.Post(core.NewMinedBlockEvent{Block: block})
+
+			// Insert the block into the set of pending ones to resultLoop for confirmations
+			w.unconfirmed.Insert(block.NumberU64(), block.Hash())
+
+		case <-w.exitCh:
+			return
+		}
+	}
+}
+```
 
 #### PoA
 
 `consensus/clique`
+
+### filecoin
