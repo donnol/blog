@@ -9,7 +9,6 @@ title: consensus
 weight: 10
 categories: ['consensus']
 tags: ['deal']
-draft: true
 ---
 
 在中文里，共表示共同（至少两个人？一个人行不行？），识表示认识，组合一起成为共识，共同的认识，引申出共同的想法、共同的行为。
@@ -271,3 +270,34 @@ func (w *worker) resultLoop() {
 `consensus/clique`
 
 ### filecoin
+
+在某段时间里存储着某些内容。
+
+需要证明存储了内容，并且存储了一段时间。
+
+PoST
+
+[关键过程：P1, P2, C1 C2](https://new.qq.com/omn/20210116/20210116A06N5600.html)
+
+调度程序
+
+[共识库： rust-fil-proofs](https://github.com/filecoin-project/rust-fil-proofs)
+
+> Storage Proofs (storage-proofs) A library for constructing storage proofs – including non-circuit proofs, corresponding SNARK circuits, and a method of combining them.
+>
+> Storage Proofs Core (storage-proofs-core) A set of common primitives used throughout the other storage-proofs sub-crates, including crypto, merkle tree, hashing and gadget interfaces.
+>
+> Storage Proofs PoRep (storage-proofs-porep) storage-proofs-porep is intended to serve as a reference implementation for Proof-of-Replication (PoRep), while also performing the heavy lifting for filecoin-proofs.
+>
+> Primary Components:
+>
+>> PoR (Proof-of-Retrievability: Merkle inclusion proof)
+>> DrgPoRep (Depth Robust Graph Proof-of-Replication)
+>> StackedDrgPoRep
+>
+> Storage Proofs PoSt (storage-proofs-post) storage-proofs-post is intended to serve as a reference implementation for Proof-of-Space-time (PoSt), for filecoin-proofs.
+>
+> Primary Components:
+>>    PoSt (Proof-of-Spacetime)
+>
+> Filecoin Proofs (filecoin-proofs) A wrapper around storage-proofs, providing an FFI-exported API callable from C (and in practice called by lotus via cgo). Filecoin-specific values of setup parameters are included here.
