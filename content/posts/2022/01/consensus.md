@@ -279,7 +279,159 @@ PoST
 
 [关键过程：P1, P2, C1 C2](https://new.qq.com/omn/20210116/20210116A06N5600.html)
 
-调度程序
+[密封接口定义](https://github.com/filecoin-project/specs-storage)
+
+```go
+type Sealer interface {
+	SealPreCommit1(ctx context.Context, sector SectorRef, ticket abi.SealRandomness, pieces []abi.PieceInfo) (PreCommit1Out, error)
+	SealPreCommit2(ctx context.Context, sector SectorRef, pc1o PreCommit1Out) (SectorCids, error)
+
+	SealCommit1(ctx context.Context, sector SectorRef, ticket abi.SealRandomness, seed abi.InteractiveSealRandomness, pieces []abi.PieceInfo, cids SectorCids) (Commit1Out, error)
+	SealCommit2(ctx context.Context, sector SectorRef, c1o Commit1Out) (Proof, error)
+
+	FinalizeSector(ctx context.Context, sector SectorRef, keepUnsealed []Range) error
+
+	// ReleaseUnsealed marks parts of the unsealed sector file as safe to drop
+	//  (called by the fsm on restart, allows storage to keep no persistent
+	//   state about unsealed fast-retrieval copies)
+	ReleaseUnsealed(ctx context.Context, sector SectorRef, safeToFree []Range) error
+	ReleaseSectorKey(ctx context.Context, sector SectorRef) error
+	ReleaseReplicaUpgrade(ctx context.Context, sector SectorRef) error
+
+	// Removes all data associated with the specified sector
+	Remove(ctx context.Context, sector SectorRef) error
+
+	// Generate snap deals replica update
+	ReplicaUpdate(ctx context.Context, sector SectorRef, pieces []abi.PieceInfo) (ReplicaUpdateOut, error)
+
+	// Prove that snap deals replica was done correctly
+	ProveReplicaUpdate1(ctx context.Context, sector SectorRef, sectorKey, newSealed, newUnsealed cid.Cid) (ReplicaVanillaProofs, error)
+	ProveReplicaUpdate2(ctx context.Context, sector SectorRef, sectorKey, newSealed, newUnsealed cid.Cid, vanillaProofs ReplicaVanillaProofs) (ReplicaUpdateProof, error)
+
+	// GenerateSectorKeyFromData computes sector key given unsealed data and updated replica
+	GenerateSectorKeyFromData(ctx context.Context, sector SectorRef, unsealed cid.Cid) error
+}
+```
+
+[密封接口实现](https://github.com/filecoin-project/lotus/tree/master/extern/sector-storage)
+
+```go
+type Manager struct {
+	ls         stores.LocalStorage
+	storage    *stores.Remote
+	localStore *stores.Local
+	remoteHnd  *stores.FetchHandler
+	index      stores.SectorIndex
+
+	sched *scheduler
+
+	storage.Prover
+
+	workLk sync.Mutex
+	work   *statestore.StateStore
+
+	callToWork map[storiface.CallID]WorkID
+	// used when we get an early return and there's no callToWork mapping
+	callRes map[storiface.CallID]chan result
+
+	results map[WorkID]result
+	waitRes map[WorkID]chan struct{}
+}
+// Manager实现了以下两个接口
+var (
+	_ storage.Sealer = (*Manager)(nil)
+	_ SectorManager = (*Manager)(nil)
+)
+```
+
+[有限状态机FSM](https://github.com/filecoin-project/lotus/tree/master/extern/storage-sealing)
+
+```go
+type Sealing struct {
+	Api      SealingAPI
+	DealInfo *CurrentDealInfoManager
+
+	feeCfg config.MinerFeeConfig
+	events Events
+
+	startupWait sync.WaitGroup
+
+	maddr address.Address
+
+	sealer  sectorstorage.SectorManager // 上述Manager实现了SectorManager接口
+	sectors *statemachine.StateGroup
+	sc      SectorIDCounter
+	verif   ffiwrapper.Verifier
+	pcp     PreCommitPolicy
+
+	inputLk        sync.Mutex
+	openSectors    map[abi.SectorID]*openSector
+	sectorTimers   map[abi.SectorID]*time.Timer
+	pendingPieces  map[cid.Cid]*pendingPiece
+	assignedPieces map[abi.SectorID][]cid.Cid
+	creating       *abi.SectorNumber // used to prevent a race where we could create a new sector more than once
+
+	upgradeLk sync.Mutex
+	toUpgrade map[abi.SectorNumber]struct{}
+
+	notifee SectorStateNotifee
+	addrSel AddrSel
+
+	stats SectorStats
+
+	terminator  *TerminateBatcher
+	precommiter *PreCommitBatcher
+	commiter    *CommitBatcher
+
+	getConfig GetSealingConfigFunc
+}
+
+// 有限状态机规则
+// 
+// 一个map，key是状态，value是一个函数，函数接受一系列事件和当前的扇区信息，对扇区执行指定操作，最后返回
+var fsmPlanners = map[SectorState]func(events []statemachine.Event, state *SectorInfo) (uint64, error) {
+	// ...
+}
+
+// Sealing实现了go-statemachine包里的StateHandler接口
+func (m *Sealing) Plan(events []statemachine.Event, user interface{}) (interface{}, uint64, error) 
+
+// 根据上面定义的有限状态转换规则执行
+func (m *Sealing) plan(events []statemachine.Event, state *SectorInfo) (func(statemachine.Context, SectorInfo) error, uint64, error) {
+	// ...
+}
+```
+
+[go-statemachine](github.com/filecoin-project/go-statemachine)
+
+```go
+type StateHandler interface {
+	// returns
+	Plan(events []Event, user interface{}) (interface{}, uint64, error)
+}
+
+// StateGroup 返回StateMachine
+func (s *StateGroup) loadOrCreate(name interface{}, userState interface{}) (*StateMachine, error) {
+	// ...
+
+	res := &StateMachine{
+		planner:  s.hnd.Plan,
+		eventsIn: make(chan Event),
+
+		name:      name,
+		st:        s.sts.Get(name),
+		stateType: s.stateType,
+
+		stageDone: make(chan struct{}),
+		closing:   make(chan struct{}),
+		closed:    make(chan struct{}),
+	}
+
+	go res.run() // 启动状态机
+
+	return res, nil
+}
+```
 
 [共识库： rust-fil-proofs](https://github.com/filecoin-project/rust-fil-proofs)
 
@@ -292,12 +444,15 @@ PoST
 > Primary Components:
 >
 >> PoR (Proof-of-Retrievability: Merkle inclusion proof)
+>>
 >> DrgPoRep (Depth Robust Graph Proof-of-Replication)
+>>
 >> StackedDrgPoRep
 >
 > Storage Proofs PoSt (storage-proofs-post) storage-proofs-post is intended to serve as a reference implementation for Proof-of-Space-time (PoSt), for filecoin-proofs.
 >
 > Primary Components:
+>
 >>    PoSt (Proof-of-Spacetime)
 >
 > Filecoin Proofs (filecoin-proofs) A wrapper around storage-proofs, providing an FFI-exported API callable from C (and in practice called by lotus via cgo). Filecoin-specific values of setup parameters are included here.
