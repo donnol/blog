@@ -410,6 +410,15 @@ type StateHandler interface {
 	Plan(events []Event, user interface{}) (interface{}, uint64, error)
 }
 
+// Send sends an event to machine identified by `id`.
+// `evt` is going to be passed into StateHandler.Planner, in the events[].User param
+//
+// If a state machine with the specified id doesn't exits, it's created, and it's
+// state is set to zero-value of stateType provided in group constructor
+// 
+// 每个id对应一个状态机
+func (s *StateGroup) Send(id interface{}, evt interface{}) (err error)
+
 // StateGroup 返回StateMachine
 func (s *StateGroup) loadOrCreate(name interface{}, userState interface{}) (*StateMachine, error) {
 	// ...
@@ -430,6 +439,66 @@ func (s *StateGroup) loadOrCreate(name interface{}, userState interface{}) (*Sta
 	go res.run() // 启动状态机
 
 	return res, nil
+}
+```
+
+[go-statestore](github.com/filecoin-project/go-statestore)
+
+```go
+// mutator func(*T) error
+// 
+// 这里的mutator函数在StateMachine.run里执行，传入的是planner，将会执行状态机函数
+func (st *StoredState) Mutate(mutator interface{}) error {
+	return st.mutate(cborMutator(mutator))
+}
+
+// 以名称查找状态，找到后执行mutator，如果有修改，保存回去
+func (st *StoredState) mutate(mutator func([]byte) ([]byte, error)) error {
+	has, err := st.ds.Has(context.TODO(), st.name)
+	if err != nil {
+		return err
+	}
+	if !has {
+		return xerrors.Errorf("No state for %s", st.name)
+	}
+
+	cur, err := st.ds.Get(context.TODO(), st.name)
+	if err != nil {
+		return err
+	}
+
+	mutated, err := mutator(cur)
+	if err != nil {
+		return err
+	}
+
+	if bytes.Equal(mutated, cur) {
+		return nil
+	}
+
+	return st.ds.Put(context.TODO(), st.name, mutated)
+}
+
+// 包装方法，将函数以另外的形式包装
+func cborMutator(mutator interface{}) func([]byte) ([]byte, error) {
+	rmut := reflect.ValueOf(mutator)
+
+	return func(in []byte) ([]byte, error) {
+		state := reflect.New(rmut.Type().In(0).Elem())
+
+		err := cborutil.ReadCborRPC(bytes.NewReader(in), state.Interface())
+		if err != nil {
+			return nil, err
+		}
+
+		out := rmut.Call([]reflect.Value{state})
+
+		if err := out[0].Interface(); err != nil {
+			return nil, err.(error)
+		}
+
+		return cborutil.Dump(state.Interface())
+	}
 }
 ```
 
