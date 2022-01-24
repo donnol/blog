@@ -7,5 +7,5 @@ package generic
 // 
 // > With the above CL this doesn't crash anymore. Still needs a proper fix but not a release blocker anymore. [From](https://github.com/golang/go/issues/48656)
 func f[P any](a, _ P) {
-	f(a, int(0))
+	// f(a, int(0))
 }
