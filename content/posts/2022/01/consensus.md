@@ -502,6 +502,46 @@ func cborMutator(mutator interface{}) func([]byte) ([]byte, error) {
 }
 ```
 
+#### lotus是如何通过cgo调用rust库的呢？
+
+[c-go绑定库生成工具](https://github.com/xlab/c-for-go)
+
+> 此库作为cgo绑定代码生成工具
+>
+> automatically creating c-go bindings for a given set of C headers and the manifest file. 
+
+[c-rust: generating C bindings from Rust code ](https://github.com/eqrion/cbindgen)
+
+> 用来生成rust代码的c绑定库
+>
+> cargo install --force cbindgen
+>
+> cbindgen --config cbindgen.toml --lang c --crate my_rust_library --output my_header.h
+
+[valgrind: 检测c/c++内存泄漏的工具](http://senlinzhan.github.io/2017/12/31/valgrind/)
+
+> Valgrind 可以用来检测程序是否有非法使用内存的问题，例如访问未初始化的内存、访问数组时越界、忘记释放动态内存等问题。
+>
+> 报错： valgrind: the 'impossible' happened: Unsupported arch_prctl option
+>
+> 需要安装最新的valgrind： manual compile the latest version of valgrind fix the problems
+
+[ffi: go-c-rust](https://github.com/filecoin-project/filecoin-ffi)
+
+> 此库作为子模块包含到lotus项目里
+>
+> 在rust目录里，有一个名为`filcrypto`的crate。
+>
+> 会构建出来三个文件：filcrypto.h, libfilcrypto.a, filcrypto.pc
+>
+>> pc文件: [pkg-config的配置文件](https://www.cnblogs.com/sddai/p/10266624.html), 把众多头文件和库文件的位置指出来
+>
+> 通过`filcrypto.yml`文件的配置(指定头文件等)来使用`c-for-go`工具生成cgo绑定: `go run github.com/xlab/c-for-go --nostamp filcrypto.yml`
+
+[rust-filecoin-proofs-api: the official public API into the proofs library](https://github.com/filecoin-project/rust-filecoin-proofs-api)
+
+#### rust-fil-proofs
+
 [共识库： rust-fil-proofs](https://github.com/filecoin-project/rust-fil-proofs)
 
 > Storage Proofs (storage-proofs) A library for constructing storage proofs – including non-circuit proofs, corresponding SNARK circuits, and a method of combining them.
