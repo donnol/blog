@@ -17,8 +17,8 @@ func TestCar(t *testing.T) {
 	wg := new(sync.WaitGroup)
 
 	for _, car := range []Runner{ // 遍历切片
-		NewCar("lanbo", 2),
-		NewCar("boshi", 3),
+		NewCar("lanbo", Red, 2),
+		NewCar("boshi", Blue, 3),
 	} {
 		wg.Add(1) // 记录一个
 		go func(car Runner) {

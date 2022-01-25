@@ -20,27 +20,42 @@ const (
 	Green Color = 3 // 绿
 )
 
+func (color Color) String() string {
+	switch color {
+	case Red:
+		return "Red"
+	case Blue:
+		return "Blue"
+	case Green:
+		return "Green"
+	}
+	return ""
+}
+
 // 函数
 func NewCar(
 	name string,
+	color Color,
 	rate int,
 ) *Car {
 	return &Car{
-		name: name,
-		rate: rate,
+		name:  name,
+		color: color,
+		rate:  rate,
 	}
 }
 
 // 类型
 type Car struct {
 	// 类型字段
-	name string // 首字母小写，非导出，只能包内使用
-	rate int
+	name  string // 首字母小写，非导出，只能包内使用
+	color Color
+	rate  int
 }
 
 // 类型方法
 func (car *Car) String() string { // 首字母大写，导出，可供其它包使用
-	return "[Car] name: " + car.name + ", rate: " + strconv.Itoa(car.rate) + "."
+	return "[Car] name: " + car.name + ", color: " + car.color.String() + ", rate: " + strconv.Itoa(car.rate) + "."
 }
 
 func (car *Car) Run(
