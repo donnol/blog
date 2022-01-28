@@ -1,4 +1,4 @@
-.PHONY:
+.PHONY:run
 
 # npm init
 # npm add express
