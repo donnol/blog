@@ -24,7 +24,7 @@ tags: ['encrypt']
         后续进入容器后，使用gpg解密：`gpg -o ebpf2.zip -d ebpf.zip.gpg`；
         再使用unzip解压：`unzip -d ebpf2 ebpf2.zip`。
 
-在镜像构建后，还要防止`docker history -H cb0b42c0cb03 --no-trunc=true`查看镜像构建历史时，泄露秘钥等信息。
+在镜像构建后，还要防止`docker history -H cb0b42c0cb03 --no-trunc=true`查看镜像构建历史时，泄露秘钥等信息。-- 可使用多阶段构建：在前一阶段使用密钥加密源码，后一阶段复制加密源码，从而避免密钥泄露。因为一般只需要把后一阶段构建出来的镜像分发出去就好了，而查看后一阶段构建出来的镜像的构建历史，是看不到密钥信息的（查看前一阶段的构建历史才会看到）。
 
 ## dockerfile COPY before mkdir will get a `no such file or directory` error
 
