@@ -1,7 +1,7 @@
 /* 通过class来配置共用样式 */
 
 .header{
-    background-color: aquamarine;
+    background-color: rgb(227, 230, 187);
     text-align: center;
 }
 .parent{
@@ -20,7 +20,7 @@
 .list{
     width: 33%;
 
-    background-color: rgb(153, 156, 156);
+    background-color: rgb(221, 233, 233);
     border-radius: 10px;
     margin: 10px;
     padding: 10px;
@@ -38,7 +38,7 @@
     border-radius: 10px;
 }
 .footer{
-    background-color: rgb(148, 160, 156);
+    background-color: rgb(219, 235, 229);
     text-align: center;
 }
 

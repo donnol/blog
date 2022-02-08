@@ -17,9 +17,9 @@
         三个独立列表
     </div>
     <div class="parent">
-        <div class="list" id="alpha">
-            字母列表
-            <ol lang="zh">
+        <div class="list" id="alpha" draggable="true" ondragstart="dragstart()" ondragleave="dragleave()">
+            字母列表(下拉刷新，上拉翻页)
+            <ol id="alpha-ol" lang="zh">
                 <li id="alpha-ele0" class="ele">
                     a
                 </li>
@@ -71,6 +71,37 @@
 
         // 修改元素的内容--id变了，这里也要跟着变
         document.getElementById("alpha-ele1").innerText = "bb"
+    }
+
+    function dragstart() {
+        console.log("drag start.")
+
+        // 进入loading
+        let sel = document.querySelector("#alpha-ol")
+        console.log(sel.firstElementChild)
+    }
+
+    function dragleave() {
+        console.log("drag leave.")
+
+        // 拿到ol，往前面添加li
+        let sel = document.getElementById("alpha-ol")
+        var ele = document.createElement("li");
+        ele.id = Math.random();
+        ele.innerHTML = "Hello" + ele.id;
+        ele.className = "ele";
+        ele.onload = function (e) {
+            console.log(e)
+        }
+        sel.insertBefore(ele, sel.firstElementChild)
+
+        // 添加新元素的时候，设置一个新的id，确保与已有id不重复；
+        // 可以使用时间戳+随机数来生成；
+        // 那问题来了，这个元素生成之后，我后面又想对它做一些操作（比如修改样式）的时候，该怎么通过这个id来获取它呢？--这个id可是在页面运行过程中生成的喔，事先又不知道，程序里怎么知道这个id呢？
+        // 不知道的话，那就在创建这个ele的时候，绑定好相关事件，在有动作触发时自动执行该事件
+
+        // 往后追加
+        // sel.appendChild(ele)
     }
 </script>
 
