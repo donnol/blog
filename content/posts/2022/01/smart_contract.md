@@ -130,6 +130,8 @@ contract VendingMachine {
 
 [一些工具库](https://ethereum.org/en/developers/docs/smart-contracts/testing/)
 
+> [truffle](https://github.com/trufflesuite/truffle) - A tool for developing smart contracts. Crafted with the finest cacaos. 
+>
 > [Waffle](https://github.com/EthWorks/Waffle) - A framework for advanced smart contract development and testing (based on ethers.js).
 >
 > [Solidity-Coverage](https://github.com/sc-forks/solidity-coverage) - Alternative solidity code coverage tool.
@@ -141,6 +143,40 @@ contract VendingMachine {
 > [OpenZeppelin Test Environment](https://github.com/OpenZeppelin/openzeppelin-test-environment)(已归档) - Blazing fast smart contract testing. One-line setup for an awesome testing experience.
 >
 > [OpenZeppelin Test Helpers](https://github.com/OpenZeppelin/openzeppelin-test-helpers) - Assertion library for Ethereum smart contract testing. Make sure your contracts behave as expected!
+
+### 实战
+
+安装[`ETH钱包MetaMask(firefox插件)`](https://metamask.io/download/)
+
+新建账户，会提示输入密码，然后生成成功后，会有一堆助记词，需要记录好：
+
+```
+jeans term salt true cereal hobby cheese awesome link nice never choose
+```
+
+钱包默认连接的是主网，因为主网要花钱买币，所以我们选择测试网。在主网那里点击设置打开`Show test networks`配置。
+
+获得地址：`0x758c40f09207f9e6F72A8C24029Be865D28eF219`
+
+[eth rinkeby测试网水龙头](https://faucet.rinkeby.io/)
+
+为上述地址去水龙头领取币。
+
+需要先把上述地址发到推特、脸书、谷家任一地方，然后再使用对应帖子的地址(如：)来获取。
+
+如果报错`nsufficient funds for gas * price + value`，可尝试使用[另外的网站](https://faucets.chain.link/rinkeby)直接使用地址获取。
+
+拿到之后，在`metamask`查看余额。
+
+[eth rinkeby测试网浏览器](https://rinkeby.etherscan.io/)
+
+在浏览器上可以查找到上述的[转账记录](https://rinkeby.etherscan.io/address/0x758c40f09207f9e6F72A8C24029Be865D28eF219)
+
+[参照这个游戏示例](https://github.com/upstateinteractive/blockchain-puzzle)
+
+[编译、部署合约](http://remix.ethereum.org/)
+
+TODO:
 
 ## evm
 
