@@ -13,6 +13,8 @@ fn main() {
     // println!("{}", v1)
 
     println!("{}", pi(10));
+
+    // generator_yield();
 }
 
 const fn add(x: u8, y: u8) -> u8 {
@@ -40,3 +42,32 @@ pub fn pi(n: u32) -> f64 {
     }
     result
 }
+
+// From https://mp.weixin.qq.com/s/ZGuqqFOcoUERMnGMtpNuIA
+// 报错：error[E0658]: yield syntax is experimental
+// use std::ops::{Generator, GeneratorState};
+// use std::pin::Pin;
+
+// fn generator_yield() {
+//     let mut generator = || {
+//         let mut val = 1;
+//         yield val; // 通过yield来保存上下文，并离开现场，下次恢复执行时，再次执行接下来的逻辑
+//         val += 1;
+//         yield val;
+//         val += 1;
+//         val
+//     };
+
+//     match Pin::new(&mut generator).resume(()) {
+//         GeneratorState::Yielded(1) => {}
+//         _ => panic!("unexpected value from resume"),
+//     }
+//     match Pin::new(&mut generator).resume(()) {
+//         GeneratorState::Yielded(2) => {}
+//         _ => panic!("unexpected value from resume"),
+//     }
+//     match Pin::new(&mut generator).resume(()) {
+//         GeneratorState::Complete(3) => {}
+//         _ => panic!("unexpected value from resume"),
+//     }
+// }
