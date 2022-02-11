@@ -1,4 +1,5 @@
-fn main() {
+#[tokio::main]
+async fn main() { // 要想在main使用async，必须在上面加上tokio::main属性，并且引入带"rt-multi-thread", "macros"特性的tokio库
     println!("Hello, world!");
 
     println!("{}", add(1, 2));
@@ -13,6 +14,9 @@ fn main() {
     // println!("{}", v1)
 
     println!("{}", pi(10));
+
+    let r = y().await;
+    println!("{}", r);
 
     // generator_yield();
 }
@@ -43,8 +47,36 @@ pub fn pi(n: u32) -> f64 {
     result
 }
 
+async fn x() -> usize {
+    5
+}
+
+// 将上面的x替换为下面的async_x
+use std::future::Future;
+
+#[allow(dead_code)]
+#[inline(never)]
+fn async_x() -> impl Future<Output = usize> { // 使用了async后，返回的其实是一个实现了Future trait的对象
+    async {
+        5
+    }
+}
+
+async fn y() -> usize {
+    let r = x().await; // 出现await时，当函数执行被阻塞时，会将执行权交出，并且会有轮询在后台运行，直到值返回，才继续执行后续逻辑
+
+    println!("{}", "y complete");
+
+    r
+}
+
 // From https://mp.weixin.qq.com/s/ZGuqqFOcoUERMnGMtpNuIA
 // 报错：error[E0658]: yield syntax is experimental
+
+// https://doc.rust-lang.org/beta/unstable-book/language-features/generators.html
+// 加了下面这句也不行
+// #![feature(generators, generator_trait)]
+
 // use std::ops::{Generator, GeneratorState};
 // use std::pin::Pin;
 

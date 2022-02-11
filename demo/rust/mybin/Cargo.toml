@@ -5,4 +5,7 @@ edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+# 在toml中，键不需要加双引号，字符串值才需要
+
 [dependencies]
+tokio = {version= "*", features=["rt-multi-thread", "macros"]}

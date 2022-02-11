@@ -1,0 +1,6 @@
+[workspace]
+
+members = [
+    "./demo/rust/mybin",
+    "./demo/rust/mylib",
+]

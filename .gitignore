@@ -4,3 +4,4 @@ demo/c/jmp/jmp
 demo/rust/mybin/target
 demo/rust/mylib/target
 node_modules
+target
