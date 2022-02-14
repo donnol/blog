@@ -23,7 +23,7 @@ func oneSendMultiRecv() {
 	ch <- 1
 }
 
-func multiSendMultiRecv() {
+func oneSendManyMultiRecv() {
 	ch := make(chan int)
 
 	go func() {
@@ -38,4 +38,29 @@ func multiSendMultiRecv() {
 
 	ch <- 1
 	ch <- 2
+}
+
+func multiSendMultiRecv() {
+	ch := make(chan int)
+
+	go func() {
+		i := <-ch
+		fmt.Printf("1 i: %d\n", i)
+	}()
+
+	go func() {
+		i := <-ch
+		fmt.Printf("2 i: %d\n", i)
+	}()
+
+	wait := make(chan bool)
+	go func() {
+		ch <- 1
+
+		wait <- true
+	}()
+
+	ch <- 2
+
+	<-wait
 }
