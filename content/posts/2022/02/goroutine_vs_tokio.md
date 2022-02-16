@@ -42,3 +42,7 @@ tags: ['concurrent']
 > The run queue must support both multiple producers and multiple consumers. The commonly used algorithm is an **intrusive linked list**(侵入性的链表). Intrusive implies that the task structure includes a pointer to the next task in the run queue instead of wrapping the task with a linked list node. This way, allocations are avoided for push and pop operations. It is possible to use a lock-free push operation but popping requires^1 a mutex to coordinate consumers.
 >
 > This scheduler model has a downside. **All processors contend on the head of the queue**(contend: 竞争). For general-purpose thread pools, this usually is not a deal breaker. The amount of time processors spend executing the task far outweighs the amount of time spent popping the task from the run queue. When tasks execute for a long period of time, queue contention is reduced. However, Rust's asynchronous tasks are expected to take very little time executing when popped from the run queue. In this scenario, the overhead from contending on the queue becomes significant.
+
+[rust async await](https://liufuyang.github.io/2019/11/10/manish-async-translation.html)
+
+> 在函数调用时插入调度点，rust通过yield来插入，实现一个函数多次返回。
