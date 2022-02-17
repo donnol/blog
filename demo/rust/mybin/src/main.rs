@@ -1,5 +1,6 @@
 #[tokio::main]
-async fn main() { // 要想在main使用async，必须在上面加上tokio::main属性，并且引入带"rt-multi-thread", "macros"特性的tokio库
+async fn main() {
+    // 要想在main使用async，必须在上面加上tokio::main属性，并且引入带"rt-multi-thread", "macros"特性的tokio库
     println!("Hello, world!");
 
     println!("{}", add(1, 2));
@@ -56,10 +57,9 @@ use std::future::Future;
 
 #[allow(dead_code)]
 #[inline(never)]
-fn async_x() -> impl Future<Output = usize> { // 使用了async后，返回的其实是一个实现了Future trait的对象
-    async {
-        5
-    }
+fn async_x() -> impl Future<Output = usize> {
+    // 使用了async后，返回的其实是一个实现了Future trait的对象
+    async { 5 }
 }
 
 async fn y() -> usize {
@@ -103,3 +103,100 @@ async fn y() -> usize {
 //         _ => panic!("unexpected value from resume"),
 //     }
 // }
+
+#[allow(dead_code)]
+fn fnd() -> impl Fn() -> usize {
+    || 1
+
+    // core::ops::function
+    // pub trait Fn<Args>
+    // where
+    //     Self: FnMut<Args>,
+    //
+    // #[fundamental] // so that regex can rely that `&str: !FnMut`
+    // #[must_use = "closures are lazy and do nothing unless called"]
+    // pub trait Fn<Args>: FnMut<Args> { - 继承了FnMut，而FnMut又继承了FnOnce；
+    //     /// Performs the call operation.
+    //     #[unstable(feature = "fn_traits", issue = "29625")]
+    //     extern "rust-call" fn call(&self, args: Args) -> Self::Output;
+    // }
+    //
+    // The version of the call operator that takes an immutable receiver.
+    // - 不可变receiver
+    // Instances of Fn can be called repeatedly without mutating state.
+    // - Fn实例可以在不改变状态情况下被重复调用
+    // This trait (Fn) is not to be confused with [function pointers] (fn).
+    // - 不要与函数指针混淆
+    // Fn is implemented automatically by closures which only take immutable references to captured variables or don't capture anything at all, as well as (safe) [function pointers] (with some caveats, see their documentation for more details). Additionally, for any type F that implements Fn, &F implements Fn, too.
+    // - 捕获的是不可变引用的变量或没有捕获任何变量的闭包自动实现Fn。另外，任何实现了Fn的类型F，&F也实现了Fn。
+
+    // Since both FnMut and FnOnce are supertraits of Fn, any instance of Fn can be used as a parameter where a FnMut or FnOnce is expected.
+    // - 因为FnMut和FnOnce都是Fn的超特征，任何Fn的实例都能被用作FnMut或FnOnce。
+}
+
+#[allow(dead_code)]
+fn fnmutd() -> impl FnMut() -> usize {
+    || 1
+
+    // core::ops::function
+    // pub trait FnMut<Args>
+    // where
+    //     Self: FnOnce<Args>,
+    //
+    // #[fundamental] // so that regex can rely that `&str: !FnMut`
+    // #[must_use = "closures are lazy and do nothing unless called"]
+    // pub trait FnMut<Args>: FnOnce<Args> {
+    //     /// Performs the call operation.
+    //     #[unstable(feature = "fn_traits", issue = "29625")]
+    //     extern "rust-call" fn call_mut(&mut self, args: Args) -> Self::Output;
+    // }
+    //
+    // The version of the call operator that takes a mutable receiver.
+    // - 可变receiver
+    // Instances of FnMut can be called repeatedly and may mutate state.
+    // - 可以被重复调用，可能修改状态
+    // FnMut is implemented automatically by closures which take mutable references to captured variables, as well as all types that implement Fn, e.g., (safe) [function pointers] (since FnMut is a supertrait of Fn). Additionally, for any type F that implements FnMut, &mut F implements FnMut, too.
+    // - 捕获了可变引用的变量，或者实现了Fn的所有类型，都会自动实现FnMut。
+    // Since FnOnce is a supertrait of FnMut, any instance of FnMut can be used where a FnOnce is expected, and since Fn is a subtrait of FnMut, any instance of Fn can be used where FnMut is expected.
+    // 因为FnOnce是FnMut的超特征，任何实现了FnMut的实例都可以被用作FnOnce。
+}
+
+#[allow(dead_code)]
+fn fnonced() -> impl FnOnce() -> usize {
+    || 1
+
+    // core::ops::function
+    // pub trait FnOnce<Args>
+    //
+    // #[rustc_on_unimplemented(
+    //     on(
+    //         Args = "()", - Args是一个小括号？
+    //         note = "wrap the `{Self}` in a closure with no arguments: `|| {{ /* code */ }}`"
+    //     ),
+    //     message = "expected a `{FnOnce}<{Args}>` closure, found `{Self}`",
+    //     label = "expected an `FnOnce<{Args}>` closure, found `{Self}`"
+    // )]
+    // #[fundamental] // so that regex can rely that `&str: !FnMut`
+    // #[must_use = "closures are lazy and do nothing unless called"]
+    // pub trait FnOnce<Args> { - Args没有指定约束，但是在上面的rustc_on_unimplemented出现了：`Args = "()"`
+    //     /// The returned type after the call operator is used.
+    //     #[lang = "fn_once_output"]
+    //     #[stable(feature = "fn_once_output", since = "1.12.0")]
+    //     type Output; - 关联类型，作为返回值类型
+
+    //     /// Performs the call operation.
+    //     #[unstable(feature = "fn_traits", issue = "29625")]
+    //     extern "rust-call" fn call_once(self, args: Args) -> Self::Output;
+    // }
+    //
+    // The version of the call operator that takes a by-value receiver.
+
+    // Instances of FnOnce can be called, but might not be callable multiple times. Because of this, if the only thing known about a type is that it implements FnOnce, it can only be called once.
+    // - FnOnce的实例不能被调用多次。只能被调用一次
+    // FnOnce is implemented automatically by closures that might consume captured variables, as well as all types that implement FnMut, e.g., (safe) [function pointers] (since FnOnce is a supertrait of FnMut).
+    // - 使用捕获变量的闭包自动实现FnOnce。
+    // Since both Fn and FnMut are subtraits of FnOnce, any instance of Fn or FnMut can be used where a FnOnce is expected.
+    // -
+    // Use FnOnce as a bound when you want to accept a parameter of function-like type and only need to call it once. If you need to call the parameter repeatedly, use FnMut as a bound; if you also need it to not mutate state, use Fn.
+    // - 当需要接收函数类型参数并只调用它一次时使用FnOnce。如果想调用多次，使用FnMut；如果还要它不改变状态，使用Fn。
+}
