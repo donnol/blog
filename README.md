@@ -4,6 +4,10 @@
 
 业务、测试、监控、反馈。
 
+联系、连接、传输、交互。
+
+计算、读写，传输。
+
 ## markdown中插入音频视频
 
 ​<audio id="audio" controls="" preload="none">
