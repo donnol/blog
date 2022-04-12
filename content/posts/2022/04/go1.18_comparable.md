@@ -1,6 +1,6 @@
 # Go 1.18 预定义接口类型
 
-先看一个提案: [proposal: spec: permit values to have type "comparable"`](https://github.com/golang/go/issues/51338) -- 允许值拥有`comparable`类型，我的理解是，现在的`comparable`只能用作泛型里的类型参数的约束，不能像普通类型那样使用，如下：
+先看一个提案: [proposal: spec: permit values to have type "comparable"](https://github.com/golang/go/issues/51338) -- 允许值拥有`comparable`类型，我的理解是，现在的`comparable`只能用作泛型里的类型参数的约束，不能像普通类型那样使用，如下：
 
 ```go
 type Set[E comparable] []E // 可以用做类型参数的约束
