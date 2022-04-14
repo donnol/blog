@@ -1,7 +1,10 @@
 package comparablex
 
 import (
+	"reflect"
 	"testing"
+
+	"github.com/donnol/blog/demo/go/comparablex/inner"
 )
 
 type I interface {
@@ -60,6 +63,10 @@ func TestReflectComparable(t *testing.T) {
 		ii2 I = II2{}
 
 		si Slice = sliceImpl{}
+
+		reftype = reflect.TypeOf(inner.Type{})
+
+		ei1 inner.EI = inner.EI1{}
 	)
 	tests := []struct {
 		name string
@@ -78,6 +85,8 @@ func TestReflectComparable(t *testing.T) {
 		{"", args{v: i1}, true},
 		{"", args{v: i2}, true},
 		{"", args{v: ii1}, true},
+		{"", args{v: reftype}, true},
+		{"", args{v: ei1}, true},
 
 		{"", args{v: sli}, false},
 		{"", args{v: m}, false},
@@ -110,10 +119,18 @@ func TestReflectComparable(t *testing.T) {
 	t.Logf("i1 = i11: %t", i1 == i11)
 	t.Logf("i2 = i22: %t", i2 == i22)
 
+	var (
+		reftype2 = reflect.TypeOf(inner.Type{})
+	)
+	t.Logf("reftype = reftype2: %t", reftype == reftype2)
+
+	var (
+		ei2 inner.EI = inner.EI1{}
+	)
+	t.Logf("ei1 = ei2: %t", ei1 == ei2)
+
 	// 返回true，会panic的情况
-	// var (
-	// 	i222 I =
-	// )
+	// 怎么触发这种情况呢？
 }
 
 func TestTypesComparable(t *testing.T) {
