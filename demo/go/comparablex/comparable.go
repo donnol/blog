@@ -30,3 +30,20 @@ func TypesComparable() bool {
 
 	return types.Comparable(t)
 }
+
+// var (
+// 	aa comparable = 1 // 赋可比较值时正常
+// 	bb comparable = []int{1} // 赋不可比较值时报错
+// )
+
+// 这个C1可比较吗？
+type C1 interface {
+	comparable
+
+	[]int
+}
+
+// interface is (or embeds) comparable
+// type S1 struct {
+// 	comparable
+// }
