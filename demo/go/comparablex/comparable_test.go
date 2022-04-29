@@ -102,15 +102,18 @@ func TestReflectComparable(t *testing.T) {
 		})
 	}
 
-	var ii11 I = II1{}
-	t.Logf("ii1 = ii11: %t", ii1 == ii11)
+	// 普通接口也能使用==来比较，但是有可能会panic
+	{
+		var ii11 I = II1{}
+		t.Logf("ii1 = ii11: %t", ii1 == ii11)
 
-	// panic: runtime error: comparing uncomparable type comparablex.II2 [recovered]
-	// panic: runtime error: comparing uncomparable type comparablex.II2
-	// var ii22 I = II2{}
-	// if ii2 == ii22 {
-	// 	t.Logf("ii2 = ii22")
-	// }
+		// panic: runtime error: comparing uncomparable type comparablex.II2 [recovered]
+		// panic: runtime error: comparing uncomparable type comparablex.II2
+		// var ii22 I = II2{}
+		// if ii2 == ii22 {
+		// 	t.Logf("ii2 = ii22")
+		// }
+	}
 
 	var (
 		i11 I = (*II1)(nil)
@@ -147,4 +150,39 @@ func TestTypesComparable(t *testing.T) {
 			}
 		})
 	}
+}
+
+func Comparable[T comparable](t1, t2 T) bool {
+	return t1 == t2
+}
+
+type IC interface {
+	Name() string
+}
+
+type ComparableStruct struct {
+	name string
+}
+
+func (cs ComparableStruct) Name() string {
+	return cs.name
+}
+
+type NotComparableStruct struct {
+	name string
+
+	m map[int]string
+}
+
+func (ncs NotComparableStruct) Name() string {
+	return ncs.name
+}
+
+func TestComparableNormalInterface(t *testing.T) {
+	var a IC = ComparableStruct{name: "jd"}
+	var b IC = NotComparableStruct{name: "jd", m: make(map[int]string)}
+	_, _ = a, b
+	// 现在提案没实现，所以普通接口并未实现comparable，会编译报错: IC does not implement comparable
+	// 如果提案通过，将会是编译通过，执行panic
+	// Comparable(a, b)
 }

@@ -96,3 +96,44 @@ func TypesComparable() bool {
 	return types.Comparable(t)
 }
 ```
+
+## 更新
+
+[使comparable仅在类型集里没有任何一个不可比较类型时正确，否则依然在编译时可通过，但运行时panic](https://github.com/golang/go/issues/52614)
+
+```go
+func Comparable[T comparable](t1, t2 T) bool {
+	return t1 == t2
+}
+
+type IC interface {
+	Name() string
+}
+
+type ComparableStruct struct {
+	name string
+}
+
+func (cs ComparableStruct) Name() string {
+	return cs.name
+}
+
+type NotComparableStruct struct {
+	name string
+
+	m map[int]string
+}
+
+func (ncs NotComparableStruct) Name() string {
+	return ncs.name
+}
+
+func main() {
+	var a IC = ComparableStruct{name: "jd"}
+	var b IC = NotComparableStruct{name: "jd", m: make(map[int]string)}
+	_, _ = a, b
+	// 现在提案没实现，所以普通接口并未实现comparable，会编译报错: IC does not implement comparable
+	// 如果提案通过，将会是编译通过，执行panic
+	// Comparable(a, b)
+}
+```
