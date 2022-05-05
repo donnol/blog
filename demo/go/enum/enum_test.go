@@ -1,6 +1,7 @@
 package enum
 
 import (
+	"encoding/json"
 	"fmt"
 	"reflect"
 	"testing"
@@ -83,14 +84,14 @@ var (
 
 		{func() any { return ColorEnumObj.Values() }, []int{1, 2, 3}},
 		{func() any { return ColorEnumObj.Fields() }, []EnumField[int]{
-			{1, "blue", "蓝色"},
-			{2, "green", "绿色"},
-			{3, "red", "红色"},
+			{"Blue", 1, "blue", "蓝色"},
+			{"Green", 2, "green", "绿色"},
+			{"Red", 3, "red", "红色"},
 		}},
 		{func() any { return ColorEnumObj.Map() }, map[int]EnumField[int]{
-			1: {1, "blue", "蓝色"},
-			2: {2, "green", "绿色"},
-			3: {3, "red", "红色"},
+			1: {"Blue", 1, "blue", "蓝色"},
+			2: {"Green", 2, "green", "绿色"},
+			3: {"Red", 3, "red", "红色"},
 		}},
 		{func() any { return ColorEnumObj.NameByValue(ColorEnumObj.Blue.Value()) }, "blue"},
 		{func() any { return ColorEnumObj.NameByValue(ColorEnumObj.Green.Value()) }, "green"},
@@ -125,22 +126,22 @@ var (
 
 		{func() any { return WeekdayEnumObj.Values() }, []string{"monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"}},
 		{func() any { return WeekdayEnumObj.Fields() }, []EnumField[string]{
-			{"monday", "monday", "星期一"},
-			{"tuesday", "tuesday", "星期二"},
-			{"wednesday", "wednesday", "星期三"},
-			{"thursday", "thursday", "星期四"},
-			{"friday", "friday", "星期五"},
-			{"saturday", "saturday", "星期六"},
-			{"sunday", "sunday", "星期日"},
+			{"Monday", "monday", "monday", "星期一"},
+			{"Tuesday", "tuesday", "tuesday", "星期二"},
+			{"Wednesday", "wednesday", "wednesday", "星期三"},
+			{"Thursday", "thursday", "thursday", "星期四"},
+			{"Friday", "friday", "friday", "星期五"},
+			{"Saturday", "saturday", "saturday", "星期六"},
+			{"Sunday", "sunday", "sunday", "星期日"},
 		}},
 		{func() any { return WeekdayEnumObj.Map() }, map[string]EnumField[string]{
-			"monday":    {"monday", "monday", "星期一"},
-			"tuesday":   {"tuesday", "tuesday", "星期二"},
-			"wednesday": {"wednesday", "wednesday", "星期三"},
-			"thursday":  {"thursday", "thursday", "星期四"},
-			"friday":    {"friday", "friday", "星期五"},
-			"saturday":  {"saturday", "saturday", "星期六"},
-			"sunday":    {"sunday", "sunday", "星期日"},
+			"monday":    {"Monday", "monday", "monday", "星期一"},
+			"tuesday":   {"Tuesday", "tuesday", "tuesday", "星期二"},
+			"wednesday": {"Wednesday", "wednesday", "wednesday", "星期三"},
+			"thursday":  {"Thursday", "thursday", "thursday", "星期四"},
+			"friday":    {"Friday", "friday", "friday", "星期五"},
+			"saturday":  {"Saturday", "saturday", "saturday", "星期六"},
+			"sunday":    {"Sunday", "sunday", "sunday", "星期日"},
 		}},
 		{func() any {
 			return WeekdayEnumObj.NameByValue(WeekdayEnumObj.Monday.Value())
@@ -222,7 +223,9 @@ func TestEnumError(t *testing.T) {
 	badParam := Convert(ErrorEnumObj.BadParam, func(ef EnumField[int]) error {
 		return fmt.Errorf("code: %v, msg: %s-%s", ef.Value(), ef.Name(), ef.ZhName())
 	})
-	t.Logf("badParam: %+v\n", badParam)
+	if badParam.Error() != "code: 1, msg: BadParam-参数错误" {
+		t.Fatalf("badParam: %+v\n", badParam)
+	}
 
 	res := Convert(ErrorEnumObj.Ok, func(ef EnumField[int]) Result {
 		return Result{
@@ -230,7 +233,13 @@ func TestEnumError(t *testing.T) {
 			Msg:  ef.ZhName(),
 		}
 	})
-	t.Logf("res: %+v\n", res)
+	data, err := json.Marshal(res)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if string(data) != `{"code":0,"msg":"正常","data":null}` {
+		t.Fatalf("bad result: %s != %s\n", data, `{"code":0,"msg":"正常","data":null}`)
+	}
 }
 
 var (

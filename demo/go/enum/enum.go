@@ -8,6 +8,7 @@ import (
 )
 
 type EnumField[T comparable] struct {
+	key    string // 结构体的字段名
 	value  T
 	name   string
 	zhName string
@@ -121,7 +122,9 @@ func Init[E comparable](e any) error {
 
 		vf := ve.Field(i)
 
-		ef := EnumField[E]{}
+		ef := EnumField[E]{
+			key: field.Name,
+		}
 		evs := strings.Split(ev, ",")
 		if len(evs) == 0 {
 			return (fmt.Errorf("field tag don't have enough value set"))
