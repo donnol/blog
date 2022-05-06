@@ -3,6 +3,7 @@ module github.com/donnol/blog/demo/go
 go 1.18
 
 require (
+	github.com/google/gopacket v1.1.19
 	github.com/pkg/errors v0.9.1
 	github.com/samber/lo v1.11.0
 	google.golang.org/grpc v1.43.0
