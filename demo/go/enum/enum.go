@@ -49,12 +49,12 @@ func (e Enum[T]) Map() map[T]EnumField[T] {
 	return e.fieldMap
 }
 
-func (e Enum[T]) NameByValue(key T) string {
-	return e.fieldMap[key].name
+func (e Enum[T]) NameByValue(value T) string {
+	return e.fieldMap[value].name
 }
 
-func (e Enum[T]) ZhNameByValue(key T) string {
-	return e.fieldMap[key].zhName
+func (e Enum[T]) ZhNameByValue(value T) string {
+	return e.fieldMap[value].zhName
 }
 
 // Init 需要传入结构体指针实例，否则报错；将根据它的enum tag的值来初始化该实例
@@ -130,6 +130,8 @@ func Init[E comparable](e any) error {
 			return (fmt.Errorf("field tag don't have enough value set"))
 		}
 		var firstValue reflect.Value
+		var fv E
+		var isE bool
 		switch fieldValueType.Kind() {
 		case reflect.Int:
 			v, err := strconv.Atoi(evs[0])
@@ -143,7 +145,11 @@ func Init[E comparable](e any) error {
 		default:
 			return fmt.Errorf("not support %v yet", fieldValueType.Kind())
 		}
-		fv := firstValue.Interface().(E)
+		fv, isE = firstValue.Interface().(E)
+		if !isE {
+			eType := reflect.TypeOf(fv)
+			fv = firstValue.Convert(eType).Interface().(E)
+		}
 		enumObj.values = append(enumObj.values, fv)
 		switch len(evs) {
 		case 1:

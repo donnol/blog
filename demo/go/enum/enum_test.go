@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"reflect"
 	"testing"
+	"time"
 )
 
 // 定义结构的同时，通过struct tag设置值
@@ -23,17 +24,21 @@ var (
 	}
 )
 
+type (
+	Weekday string
+)
+
 // 考虑到结构体只需出现一次，直接使用匿名结构体，并且在定义结构体的同时声明变量
 var (
 	WeekdayEnumObj struct {
-		Enum[string]
-		Monday    EnumField[string] `enum:"monday,星期一"`
-		Tuesday   EnumField[string] `enum:"tuesday,星期二"`
-		Wednesday EnumField[string] `enum:"wednesday,星期三"`
-		Thursday  EnumField[string] `enum:"thursday,星期四"`
-		Friday    EnumField[string] `enum:"friday,星期五"`
-		Saturday  EnumField[string] `enum:"saturday,星期六"`
-		Sunday    EnumField[string] `enum:"sunday,星期日"`
+		Enum[Weekday]
+		Monday    EnumField[Weekday] `enum:"monday,星期一"`
+		Tuesday   EnumField[Weekday] `enum:"tuesday,星期二"`
+		Wednesday EnumField[Weekday] `enum:"wednesday,星期三"`
+		Thursday  EnumField[Weekday] `enum:"thursday,星期四"`
+		Friday    EnumField[Weekday] `enum:"friday,星期五"`
+		Saturday  EnumField[Weekday] `enum:"saturday,星期六"`
+		Sunday    EnumField[Weekday] `enum:"sunday,星期日"`
 	}
 )
 
@@ -41,7 +46,7 @@ var (
 func init() {
 	panicIf(Init[int](&ColorEnumObj))
 
-	panicIf(Init[string](&WeekdayEnumObj))
+	panicIf(Init[Weekday](&WeekdayEnumObj))
 }
 
 func TestEnum(t *testing.T) {
@@ -53,10 +58,10 @@ func TestEnum(t *testing.T) {
 		{"weekday", weekdayHandlers},
 	} {
 		t.Run(testCase.name, func(t *testing.T) {
-			for _, h := range testCase.handlers {
+			for i, h := range testCase.handlers {
 				r := h.handler()
 				if !reflect.DeepEqual(r, h.want) {
-					t.Fatalf("bad case: %v != %v\n", r, h.want)
+					t.Fatalf("bad case [No.%d]: %v != %v\n", i+1, r, h.want)
 				}
 			}
 		})
@@ -102,13 +107,13 @@ var (
 	}
 
 	weekdayHandlers = []handler{
-		{func() any { return WeekdayEnumObj.Monday.Value() }, "monday"},
-		{func() any { return WeekdayEnumObj.Tuesday.Value() }, "tuesday"},
-		{func() any { return WeekdayEnumObj.Wednesday.Value() }, "wednesday"},
-		{func() any { return WeekdayEnumObj.Thursday.Value() }, "thursday"},
-		{func() any { return WeekdayEnumObj.Friday.Value() }, "friday"},
-		{func() any { return WeekdayEnumObj.Saturday.Value() }, "saturday"},
-		{func() any { return WeekdayEnumObj.Sunday.Value() }, "sunday"},
+		{func() any { return WeekdayEnumObj.Monday.Value() }, Weekday("monday")},
+		{func() any { return WeekdayEnumObj.Tuesday.Value() }, Weekday("tuesday")},
+		{func() any { return WeekdayEnumObj.Wednesday.Value() }, Weekday("wednesday")},
+		{func() any { return WeekdayEnumObj.Thursday.Value() }, Weekday("thursday")},
+		{func() any { return WeekdayEnumObj.Friday.Value() }, Weekday("friday")},
+		{func() any { return WeekdayEnumObj.Saturday.Value() }, Weekday("saturday")},
+		{func() any { return WeekdayEnumObj.Sunday.Value() }, Weekday("sunday")},
 		{func() any { return WeekdayEnumObj.Monday.Name() }, "monday"},
 		{func() any { return WeekdayEnumObj.Tuesday.Name() }, "tuesday"},
 		{func() any { return WeekdayEnumObj.Wednesday.Name() }, "wednesday"},
@@ -124,24 +129,24 @@ var (
 		{func() any { return WeekdayEnumObj.Saturday.ZhName() }, "星期六"},
 		{func() any { return WeekdayEnumObj.Sunday.ZhName() }, "星期日"},
 
-		{func() any { return WeekdayEnumObj.Values() }, []string{"monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"}},
-		{func() any { return WeekdayEnumObj.Fields() }, []EnumField[string]{
-			{"Monday", "monday", "monday", "星期一"},
-			{"Tuesday", "tuesday", "tuesday", "星期二"},
-			{"Wednesday", "wednesday", "wednesday", "星期三"},
-			{"Thursday", "thursday", "thursday", "星期四"},
-			{"Friday", "friday", "friday", "星期五"},
-			{"Saturday", "saturday", "saturday", "星期六"},
-			{"Sunday", "sunday", "sunday", "星期日"},
+		{func() any { return WeekdayEnumObj.Values() }, []Weekday{"monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"}},
+		{func() any { return WeekdayEnumObj.Fields() }, []EnumField[Weekday]{
+			{"Monday", Weekday("monday"), "monday", "星期一"},
+			{"Tuesday", Weekday("tuesday"), "tuesday", "星期二"},
+			{"Wednesday", Weekday("wednesday"), "wednesday", "星期三"},
+			{"Thursday", Weekday("thursday"), "thursday", "星期四"},
+			{"Friday", Weekday("friday"), "friday", "星期五"},
+			{"Saturday", Weekday("saturday"), "saturday", "星期六"},
+			{"Sunday", Weekday("sunday"), "sunday", "星期日"},
 		}},
-		{func() any { return WeekdayEnumObj.Map() }, map[string]EnumField[string]{
-			"monday":    {"Monday", "monday", "monday", "星期一"},
-			"tuesday":   {"Tuesday", "tuesday", "tuesday", "星期二"},
-			"wednesday": {"Wednesday", "wednesday", "wednesday", "星期三"},
-			"thursday":  {"Thursday", "thursday", "thursday", "星期四"},
-			"friday":    {"Friday", "friday", "friday", "星期五"},
-			"saturday":  {"Saturday", "saturday", "saturday", "星期六"},
-			"sunday":    {"Sunday", "sunday", "sunday", "星期日"},
+		{func() any { return WeekdayEnumObj.Map() }, map[Weekday]EnumField[Weekday]{
+			Weekday("monday"):    {"Monday", Weekday("monday"), "monday", "星期一"},
+			Weekday("tuesday"):   {"Tuesday", Weekday("tuesday"), "tuesday", "星期二"},
+			Weekday("wednesday"): {"Wednesday", Weekday("wednesday"), "wednesday", "星期三"},
+			Weekday("thursday"):  {"Thursday", Weekday("thursday"), "thursday", "星期四"},
+			Weekday("friday"):    {"Friday", Weekday("friday"), "friday", "星期五"},
+			Weekday("saturday"):  {"Saturday", Weekday("saturday"), "saturday", "星期六"},
+			Weekday("sunday"):    {"Sunday", Weekday("sunday"), "sunday", "星期日"},
 		}},
 		{func() any {
 			return WeekdayEnumObj.NameByValue(WeekdayEnumObj.Monday.Value())
@@ -255,4 +260,23 @@ func TestRepeatedEnum(t *testing.T) {
 	if err.Error() != "enum value 1 already exist, please use another value" {
 		t.Fatal(err)
 	}
+}
+
+// 其它类型含有该枚举字段时
+type (
+	Day struct {
+		Time    time.Time
+		Weekday Weekday // 使用枚举类型
+	}
+)
+
+func TestUseEnumStruct(t *testing.T) {
+	var day = Day{
+		Time:    time.Now(),
+		Weekday: WeekdayEnumObj.Monday.Value(), // 设置枚举值
+		// Weekday: "monda", // 但其实，直接使用字符串字面值也可以~~；即使是错误值也可以
+	}
+	t.Skip()
+
+	t.Logf("day: %+v\n", day)
 }
