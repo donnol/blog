@@ -8,6 +8,8 @@
 
 计算、读写，传输。
 
+试验、报告(demo, post)。
+
 ## markdown中插入音频视频
 
 ​<audio id="audio" controls="" preload="none">
