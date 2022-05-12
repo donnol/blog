@@ -187,14 +187,14 @@ func getIUserSrvProxy(base IUserSrv) *UserSrvMock {
                         log.Printf("[ctx: %s]used time: %v\n", _gen_ctx.Uniq(), time.Since(_gen_begin))
 
                         return _gen_r0
-		},
+                },
         }
 }
 
 var (
-        userSrvMockCommonProxyContext = inject.ProxyContext{
-		PkgPath:       "接口所在包",
-		InterfaceName: "包名",
+	userSrvMockCommonProxyContext = inject.ProxyContext{
+		PkgPath:       "接口所在包路径，如：github.com/donnol/tools/inject",
+		InterfaceName: "接口名，如：IUserSrv",
 	}
 	UserSrvMockCheckUserProxyContext = func() (pctx inject.ProxyContext) {
 		pctx = userSrvMockCommonProxyContext
@@ -213,7 +213,7 @@ func RegisterProxyMethod(pctx inject.ProxyContext, cf inject.CtxFunc) {
 }
 
 func main() {
-        RegisterProxyMethod(UserSrvMockCheckUserProxyContext, func(ctx ProxyContext, method any, args []any) (res []any) {
+	RegisterProxyMethod(UserSrvMockCheckUserProxyContext, func(ctx ProxyContext, method any, args []any) (res []any) {
 		log.Printf("custom call")
 
                 // 从any断言回具体的函数、参数
