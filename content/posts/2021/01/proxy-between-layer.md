@@ -231,3 +231,110 @@ func main() {
 ```
 
 最后，一个既能添加通用逻辑，又能添加定制逻辑的`proxy`就完成了。
+
+## 对于任意函数调用通过替换ast节点来添加Proxy
+
+`normal.go`:
+
+```go
+package proxy
+
+import (
+	"log"
+)
+
+func A(ctx any, id int, args ...string) (string, error) {
+	log.Printf("arg, ctx: %v, id: %v, args: %+v\n", ctx, id, args)
+	return "A", nil
+}
+func C() {
+	args := []string{"a", "b", "c", "d"}
+	r1, err := A(1, 1, args...)
+	if err != nil {
+		log.Printf("err: %v\n", err)
+		return
+	}
+	log.Printf("r1: %v\n", r1)
+}
+```
+
+在上述代码中，`C`函数调用了`A`函数，那么，现在我想在这个调用前后添加耗时统计，该怎么办呢？
+
+```go
+// 添加耗时统计
+func C() {
+        begin := time.Now()
+
+	args := []string{"a", "b", "c", "d"}
+	r1, err := A(1, 1, args...)
+	if err != nil {
+		log.Printf("err: %v\n", err)
+		return
+	}
+	log.Printf("r1: %v\n", r1)
+
+        log.Printf("used time: %v\n", time.Since(begin))
+}
+```
+
+如果，我能生成一个`AProxy`函数，里面包含有耗时统计等逻辑，再把`C`对`A`的调用改为对`Aproxy`的调用，是不是就非常方便了呢！
+
+```sh
+# 安装工具
+go install github.com/donnol/tools/cmd/tbc@master
+
+# 执行命令，生成代码
+tbc genproxy -p ./parser/testtype/proxy/ --func A
+```
+
+`gen_proxy.go`:
+
+```go
+package proxy
+
+import (
+	"log"
+	"time"
+)
+
+// 生成A的Proxy
+func AProxy(ctx any, id int, args ...string) (string, error) {
+	begin := time.Now()
+
+	var r0 string
+	var r1 error
+
+	r0, r1 = A(ctx, id, args...)
+
+	log.Printf("used time: %v\n", time.Since(begin))
+
+	return r0, r1
+}
+```
+
+`normal.go`:
+
+```go
+package proxy
+
+import (
+	"log"
+)
+
+func A(ctx any, id int, args ...string) (string, error) {
+	log.Printf("arg, ctx: %v, id: %v, args: %+v\n", ctx, id, args)
+	return "A", nil
+}
+func C() {
+	args := []string{"a", "b", "c", "d"}
+        // 此处对A的调用就被替换为对AProxy的调用了
+	r1, err := AProxy(1, 1, args...)
+	if err != nil {
+		log.Printf("err: %v\n", err)
+		return
+	}
+	log.Printf("r1: %v\n", r1)
+}
+```
+
+[代码实现详见](https://github.com/donnol/tools/blob/feat/inject-proxy-caller/cmd/tbc/main.go#L404)
