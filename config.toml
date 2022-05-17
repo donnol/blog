@@ -5,6 +5,8 @@ theme = "book"
 
 disqusShortname = "donno272"
 
+googleAnalytics: "G-PNRWGCH4KN"
+
 [author]
   name = "jdlau"
   homepage = "https://github.com/donnol"

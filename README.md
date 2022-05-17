@@ -24,3 +24,15 @@
 </iframe>
 
 在`[url]`的位置替换进实际的音视频链接即可。
+
+## google analytics
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-PNRWGCH4KN"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-PNRWGCH4KN');
+</script>
