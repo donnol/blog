@@ -5,7 +5,7 @@ theme = "book"
 
 disqusShortname = "donno272"
 
-googleAnalytics: "G-PNRWGCH4KN"
+googleAnalytics = "G-PNRWGCH4KN"
 
 [author]
   name = "jdlau"
