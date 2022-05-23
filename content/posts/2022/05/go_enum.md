@@ -1,3 +1,16 @@
+---
+author: "jdlau"
+date: 2022-05-12
+linktitle: Go enum
+menu:
+next:
+prev:
+title: Go enum
+weight: 10
+categories: ['Go']
+tags: ['enum']
+---
+
 # Go enum
 
 Go是没有内置枚举类型的，那么，当需要使用枚举时，该怎么办呢？

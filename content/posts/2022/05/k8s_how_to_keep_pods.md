@@ -1,3 +1,16 @@
+---
+author: "jdlau"
+date: 2022-05-13
+linktitle: k8s是怎么维持pod的运行的呢？
+menu:
+next:
+prev:
+title: k8s是怎么维持pod的运行的呢？
+weight: 10
+categories: ['K8s']
+tags: ['pod']
+---
+
 # k8s是怎么维持pod的运行的呢？
 
 当接收了yaml配置的信息后，是怎么维持pod根据声明一直运行的呢？
