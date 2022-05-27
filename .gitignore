@@ -6,3 +6,5 @@ demo/rust/mylib/target
 node_modules
 target
 .vscode/
+# dlv debug.test
+debug.test
