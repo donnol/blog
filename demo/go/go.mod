@@ -6,7 +6,7 @@ require (
 	github.com/bits-and-blooms/bloom/v3 v3.2.0
 	github.com/denisenkom/go-mssqldb v0.12.2
 	github.com/google/gopacket v1.1.19
-	github.com/iceber/iouring-go v0.0.0-20220511091803-99712053f7ec
+	github.com/iceber/iouring-go v0.0.0-20220609112130-b1dc8dd9fbfd
 	github.com/pkg/errors v0.9.1
 	github.com/samber/lo v1.11.0
 	google.golang.org/grpc v1.43.0
