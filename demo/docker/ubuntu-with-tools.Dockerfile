@@ -1,12 +1,10 @@
 FROM ubuntu:focal
 
-RUN cat /etc/apt/sources.list
-
 RUN sed -i "s@/security.ubuntu.com/@/mirrors.aliyun.com/@g" /etc/apt/sources.list \
     && sed -i "s@/archive.ubuntu.com/@/mirrors.aliyun.com/@g" /etc/apt/sources.list \
     # update after change apt source
-    && set -x && apt-get update
-RUN apt-get -y install apt-utils && \
+    && set -x && apt-get update && \
+    apt-get -y install apt-utils && \
     #
     # remove this file otherwise man pages of later installed tools will not be istalled
     #rm -f /etc/dpkg/dpkg.cfg.d/excludes && \
@@ -15,27 +13,26 @@ RUN apt-get -y install apt-utils && \
     (echo y; echo y; echo y; echo y) | unminimize && \
     #
     # install *.UTF-8 locales otherwise some apps get trouble
-    apt-get -y install locales && locale-gen en_US.UTF-8 ja_JP.UTF-8 zh_CN.UTF-8 && update-locale LANG=en_US.UTF-8
+    apt-get -y install locales && locale-gen en_US.UTF-8 ja_JP.UTF-8 zh_CN.UTF-8 && update-locale LANG=en_US.UTF-8 && \
     #
     # install other utilities
-RUN apt-get -y install \
+    apt-get -y install && \
         apt-transport-https \
         bash-completion vim less man jq bc \
-        lsof tree psmisc htop lshw sysstat dstat \
-        iproute2 iputils-ping iptables dnsutils traceroute \
-        netcat curl wget nmap socat netcat-openbsd rsync \
+        # lsof tree psmisc htop lshw sysstat dstat \
+        # iproute2 iputils-ping iptables dnsutils traceroute \
+        # netcat nmap socat netcat-openbsd rsync \
+        curl wget \
         p7zip-full \
         git tig \
-        binutils acl pv \
-        strace tcpdump
-
+        # binutils acl pv \
+        strace tcpdump && \
     #
     # enable bash-completeion for root user (other users works by default)
-RUN    (echo && echo '[ -f /etc/bash_completion ] && ! shopt -oq posix && . /etc/bash_completion') >> ~/.bashrc
-
+    (echo && echo '[ -f /etc/bash_completion ] && ! shopt -oq posix && . /etc/bash_completion') >> ~/.bashrc && \
     #
     # install sudo and create a sudoable user 'jd'
-RUN apt-get -y install sudo && \
+    apt-get -y install sudo && \
         adduser --disabled-password --gecos "Developer" jd && \
         adduser jd sudo && \
         echo "jd ALL=(ALL:ALL) NOPASSWD: ALL" >> /etc/sudoers && \
