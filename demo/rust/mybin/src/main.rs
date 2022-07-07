@@ -1,3 +1,6 @@
+pub mod tree;
+use crate::tree::tree::new_tree;
+
 #[tokio::main]
 async fn main() {
     // 要想在main使用async，必须在上面加上tokio::main属性，并且引入带"rt-multi-thread", "macros"特性的tokio库
@@ -20,6 +23,9 @@ async fn main() {
     println!("{}", r);
 
     // generator_yield();
+
+    let t = new_tree();
+    println!("{:?}", t);
 }
 
 const fn add(x: u8, y: u8) -> u8 {
