@@ -42,11 +42,21 @@ var (
 	}
 )
 
+var (
+	// 最多也就赋个值，没有中文名，也没有枚举集合
+	UnitEnum struct {
+		Inch string `enum:"inch,英寸"`
+		Cm   string `enum:",厘米"`
+	}
+)
+
 // 初始化
 func init() {
 	panicIf(Init[int](&ColorEnumObj))
 
 	panicIf(Init[Weekday](&WeekdayEnumObj))
+
+	panicIf(Init[string](&UnitEnum))
 }
 
 func TestEnum(t *testing.T) {
