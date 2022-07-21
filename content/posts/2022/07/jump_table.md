@@ -7,8 +7,8 @@ next:
 prev:
 title: Jump Table
 weight: 10
-categories: ['Go']
-tags: ['version']
+categories: ['structure']
+tags: ['jump table']
 ---
 
 ## What's Jump Table?
