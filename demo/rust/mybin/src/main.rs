@@ -1,5 +1,5 @@
 pub mod tree;
-use crate::tree::tree::new_tree;
+use crate::tree::tree::{new_tree, Treer};
 
 #[tokio::main]
 async fn main() {
@@ -26,6 +26,13 @@ async fn main() {
 
     let t = new_tree();
     println!("{:?}", t);
+    let value = t.find("1".to_string());
+    println!("{:?}", value);
+
+    let mut tree1 = new_tree();
+    tree1.insert("1".to_string(), "4".to_string());
+    let value = tree1.find("1".to_string());
+    println!("{:?}", value);
 }
 
 const fn add(x: u8, y: u8) -> u8 {
