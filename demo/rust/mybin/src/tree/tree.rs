@@ -52,4 +52,12 @@ mod tests {
         let value = tree1.find("1".to_string());
         assert_eq!(value, "4".to_string());
     }
+
+    // bench is not stable yet.
+
+    // #[bench]
+    // fn tree_bench(b: &mut Bencher) {
+    //     let tree = new_tree();
+    //     let value = tree.find("1".to_string());
+    // }
 }
