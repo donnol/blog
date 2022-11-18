@@ -150,3 +150,77 @@ func main() {
 	// Comparable(a, b)
 }
 ```
+
+## 更新（2022-11-18）
+
+[临近1.20发布之时，新的提案来了](https://github.com/golang/go/issues/56548)
+
+### 情况
+
+这个提案会兼容泛型加入前已有的规则。也就是能用`==`，但是有可能在运行时panic。
+
+```go
+type M struct{ f any }                        // 注意看，f字段的类型为any
+fmt.Println(M{f: 1} == M{f: 2})               // 可编译通过，运行时正常执行：false
+fmt.Println(M{f: []int{1}} == M{f: []int{2}}) // 可编译通过，运行时panic：panic: runtime error: comparing uncomparable type []int
+```
+
+[跑来看看](https://go.dev/play/p/69Un_xqq0cX)
+
+> If we want any to satisfy comparable, then constraint satisfaction can't be the same as interface implementation. A non-comparable type T (say []int) implements any, but T does not implement comparable (T is not in comparable's type set). Therefore any cannot possibly implement comparable (the implements relation is transitive - we cannot change that). So if we want any to satisfy the comparable constraint, then constraint satisfaction can't be the same as interface implementation.
+>
+> -- 如果想要any满足comparable，约束满足就不能跟接口实现一样。
+> -- 这里用[]int类型举例，它是不可比较的（其实它可以与nil比较，不过也仅能与nil比较），它实现了any，但它没有实现comparable。所以按照这样下去，any是不能实现comparable的。
+> -- 那么，如果我们想要any满足comparable约束，约束满足就不能跟接口实现一样。
+
+### 提议
+
+> We change the spec to use a different rule for constraint satisfaction than for interface implementation: we want spec-comparable types to satisfy comparable; i.e., we want to be able to use any type for which == is defined even if it may not be strictly comparable.
+>
+> -- 修改spec规范，对于`约束满足`使用跟`接口实现`不同的规则。约定`spec-comparable`类型满足`comparable`。
+>
+> With this change, constraint satisfaction matches interface implementation but also contains an exception for spec-comparable types. This exception permits the use of interfaces as type arguments which require strict comparability.
+>
+> -- 这样修改之后，`约束满足`除了会有一个关于`spec-comparable`类型的异常外，基本上匹配`接口实现`。这个异常允许使用接口作为泛型的类型参数，这个类型参数要求`strict-comparability(严格的可比较)`。
+
+关于`spec-comparable`和`strict-comparable`:
+
+> For clarity, in the following we use the term `strictly comparable` for the types in comparable, and spec-comparable for types of `comparable operands`. Strictly comparable types are spec-comparable, but not the other way around. Types that are not spec-comparable are simply not comparable.
+>
+> -- 在`comparable`里的类型即是`strictly comparable`的，支持比较符（==，!=）的类型是`spec-comparable`。
+> 很明显，`Strictly comparable`类型一定是`spec-comparable`，但反过来就不一定。不是`spec-comparable`的类型就一定不是`comparable`(不能满足comparable约束)。
+
+关于`satisfy`:
+
+> We also add a new paragraph defining what "satisfy" means:
+>
+>> A type T satisfies a constraint interface C if
+>>
+>> T implements C; or
+>> C can be written in the form interface{ comparable; E }, where E is a basic interface and T is comparable and implements E.
+>
+> -- 如果说类型T满足约束C：
+> -- T实现了C；或者
+> -- C可以被写为以下格式：interface{ comparable: E}，其中`E是一个基础接口(只有方法，没有type set)`并且`T满足comparable约束并实现了E`。
+
+### 编译时静态检查
+
+**那如何在编译时确保某类型是可比较的呢？**
+
+如果要在编译时确保某个类型是可比较的，可以[这样](https://github.com/golang/go/issues/56548#issuecomment-1317673963)：
+
+```go
+// we want to ensure that T is strictly comparable
+type T struct {
+	x int
+}
+
+// define a helper function with a type parameter P constrained by T
+// and use that type parameter with isComparable
+// -- 把该类型T作为约束使用，并且对应的类型参数用于实例化一个使用了comparable约束的泛型函数
+func TisComparable[P T]() {
+	_ = isComparable[P]
+}
+
+func isComparable[_ comparable]() {}
+```
