@@ -227,3 +227,57 @@ func TestOption(t *testing.T) {
 	// 希望官方添加这方面的支持吧
 	// 如果解析得到json.RawMessage之后通过jsonpath获取字段值呢？感觉需要类型转换，还是麻烦
 }
+
+// 或者基于mo.Option，修改它的UnmarshalJSON实现，增加一个字段或把bool值改为枚举值来表示是否存在、null、常值
+func TestMyOption(t *testing.T) {
+	type M struct {
+		Name Option[string] `json:"name"`
+	}
+	{
+		// 当json字符串里没有所需键时，该字段是不会执行它的UnmarshalJSON方法的
+		// 所以Option.present会是0，亦即不存在
+		data := `{}`
+		var m M
+		if err := json.Unmarshal([]byte(data), &m); err != nil {
+			t.Error(err)
+		}
+		if m.Name.Exist() {
+			t.Errorf("name exist")
+		}
+	}
+	{
+		data := `{"name": null}`
+		var m M
+		if err := json.Unmarshal([]byte(data), &m); err != nil {
+			t.Error(err)
+		}
+		if !m.Name.IsNull() {
+			t.Errorf("name is not nil")
+		}
+	}
+	{
+		data := `{"name": "jd"}`
+		var m M
+		if err := json.Unmarshal([]byte(data), &m); err != nil {
+			t.Error(err)
+		}
+		if !m.Name.HasValue() || m.Name.MustGet() != "jd" {
+			t.Errorf("name is not nil")
+		}
+	}
+}
+
+func TestMarshalAndUnmarshalEmpty(t *testing.T) {
+	data, err := json.Marshal(nil)
+	if err != nil {
+		t.Error(err)
+	}
+	if string(data) != "null" {
+		t.Errorf("%s != null", data)
+	}
+
+	m := struct{ Name string }{}
+	if err := json.Unmarshal([]byte(""), &m); err.Error() != "unexpected end of JSON input" {
+		t.Error(err)
+	}
+}
