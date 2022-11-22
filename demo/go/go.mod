@@ -9,6 +9,7 @@ require (
 	github.com/iceber/iouring-go v0.0.0-20220609112130-b1dc8dd9fbfd
 	github.com/pkg/errors v0.9.1
 	github.com/samber/lo v1.11.0
+	github.com/samber/mo v1.5.1
 	golang.org/x/exp v0.0.0-20220722155223-a9213eeb770e
 	google.golang.org/grpc v1.43.0
 	gorm.io/gorm v1.23.5
