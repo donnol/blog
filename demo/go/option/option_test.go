@@ -225,4 +225,5 @@ func TestOption(t *testing.T) {
 	}
 	// 不过也不好用，先要定义一个字段类型都是json.RawMessage的结构体来解析，然后解析得到之后根据长度判断完是否存在之后还要再次执行json解析，得不偿失
 	// 希望官方添加这方面的支持吧
+	// 如果解析得到json.RawMessage之后通过jsonpath获取字段值呢？感觉需要类型转换，还是麻烦
 }
