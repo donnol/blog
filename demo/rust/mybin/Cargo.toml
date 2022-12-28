@@ -9,3 +9,4 @@ edition = "2021"
 
 [dependencies]
 tokio = {version= "*", features=["rt-multi-thread", "macros"]}
+futures = "*"

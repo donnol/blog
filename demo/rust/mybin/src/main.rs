@@ -33,6 +33,9 @@ async fn main() {
     tree1.insert("1".to_string(), "4".to_string());
     let value = tree1.find("1".to_string());
     println!("{:?}", value);
+
+    println!("block: {}", block());
+    println!("join: {:?}", block_on(join()));
 }
 
 const fn add(x: u8, y: u8) -> u8 {
@@ -67,6 +70,7 @@ async fn x() -> usize {
 
 // 将上面的x替换为下面的async_x
 use std::future::Future;
+use futures::executor::block_on;
 
 #[allow(dead_code)]
 #[inline(never)]
@@ -81,6 +85,15 @@ async fn y() -> usize {
     println!("{}", "y complete");
 
     r
+}
+
+fn block() -> usize {
+    let r = x();
+    block_on(r)
+}
+
+async fn join() -> (usize, usize) {
+    futures::join!(x(), x())
 }
 
 // From https://mp.weixin.qq.com/s/ZGuqqFOcoUERMnGMtpNuIA
