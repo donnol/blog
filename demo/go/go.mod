@@ -8,9 +8,9 @@ require (
 	github.com/google/gopacket v1.1.19
 	github.com/iceber/iouring-go v0.0.0-20220609112130-b1dc8dd9fbfd
 	github.com/pkg/errors v0.9.1
-	github.com/samber/lo v1.11.0
-	github.com/samber/mo v1.5.1
-	golang.org/x/exp v0.0.0-20220722155223-a9213eeb770e
+	github.com/samber/lo v1.37.0
+	github.com/samber/mo v1.7.0
+	golang.org/x/exp v0.0.0-20221227203929-1b447090c38c
 	google.golang.org/grpc v1.43.0
 	gorm.io/gorm v1.23.5
 )
@@ -27,7 +27,7 @@ require (
 require (
 	github.com/golang/protobuf v1.5.2 // indirect
 	golang.org/x/net v0.0.0-20210610132358-84b48f89b13b // indirect
-	golang.org/x/sys v0.0.0-20211019181941-9d821ace8654 // indirect
+	golang.org/x/sys v0.1.0 // indirect
 	golang.org/x/text v0.3.6 // indirect
 	google.golang.org/genproto v0.0.0-20200526211855-cb27e3aa2013 // indirect
 	google.golang.org/protobuf v1.27.1
