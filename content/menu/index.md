@@ -3,6 +3,8 @@ headless: true
 ---
 
 - [**文章列表**]({{< relref "/posts" >}})
+- [**2023**]({{< relref "/posts/2023" >}})
+  - [01]({{< relref "/posts/2023/01" >}})
 - [**2022**]({{< relref "/posts/2022" >}})
   - [01]({{< relref "/posts/2022/01" >}})
 - [**2021**]({{< relref "/posts/2021" >}})
