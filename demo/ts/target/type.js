@@ -3,8 +3,10 @@ exports.__esModule = true;
 exports.MultiPager2 = exports.MultiPager = void 0;
 function printm(m) {
     console.log(m);
+    console.log(typeof m);
     return 0;
 }
+printm("abc");
 var MultiPager = /** @class */ (function () {
     function MultiPager() {
         this.fetch = function (opts) {

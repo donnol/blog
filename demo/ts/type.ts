@@ -9,8 +9,13 @@ type M = {
 
 function printm(m: M): U {
     console.log(m);
+    let type = typeof m;
+    console.log(type);
     return 0;
 }
+
+printm(212);
+printm("abc");
 
 type MK<T> = T extends void ? {
     more?: boolean
