@@ -11,3 +11,8 @@ run:
 	ts-node --files type.ts
 	ts-node --files join.ts
 	ts-node --files result.ts
+
+deno_run:
+	deno run type.ts
+	deno run join.ts
+	deno run result.ts

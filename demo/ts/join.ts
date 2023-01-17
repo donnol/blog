@@ -11,17 +11,17 @@ export function leftJoin<L, R, LR>(
     cond: Cond<L, R>,
     f: (l: L, r: R) => LR,
 ): LR[] {
-    let rm = new Map()
-    right.forEach((value: R, index: number, array: R[]) => {
-        let rv = getProperty(value, cond.r)
+    const rm = new Map()
+    right.forEach((value: R, _index: number, _array: R[]) => {
+        const rv = getProperty(value, cond.r)
         rm.set(rv, value)
     })
 
-    let res = new Array(left.length)
-    left.forEach((value: L, index: number, array: L[]) => {
-        let lv = getProperty(value, cond.l)
-        let rv = rm.get(lv)
-        let lr = f(value, rv)
+    const res = new Array(left.length)
+    left.forEach((value: L, _index: number, _array: L[]) => {
+        const lv = getProperty(value, cond.l)
+        const rv = rm.get(lv)
+        const lr = f(value, rv)
         res.push(lr)
     })
 
@@ -56,7 +56,7 @@ const articles = [
     },
 ]
 
-let res = leftJoin(users, articles, { l: "id", r: "userId" }, (l, r) => {
+const res = leftJoin(users, articles, { l: "id", r: "userId" }, (l, r) => {
     return {
         id: r.id,
         name: r.name,

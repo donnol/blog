@@ -9,7 +9,7 @@ type M = {
 
 function printm(m: M): U {
     console.log(m);
-    let type = typeof m;
+    const type = typeof m;
     console.log(type);
     return 0;
 }
