@@ -11,7 +11,17 @@ categories: ['Go', 'TypeScript']
 tags: ['generic']
 ---
 
-# Go泛型
+# 泛型
+
+调用方除了可自行决定参数值之外，还可以自行决定参数类型。
+
+这样使得代码更灵活，更有扩展性，同时更安全。
+
+## Go泛型
+
+### 为什么？
+
+那使用interface{}不也可以吗？
 
 试看：
 
@@ -50,6 +60,7 @@ func AddAny(x, y interface{}) interface{} {
 }
 // interface{}表示可以接收任意类型的值，并且返回任意类型的值
 // 换言之，参数的类型和返回值的类型没有必然联系--从签名看来，它们可以一样，也可以不一样
+// 所以，使用interface{}不够安全。
 
 func AddGeneric1[T any](x, y T) T // 看起来跟AddAny差不多，但是参数类型和返回值类型必然是相同的
 
@@ -67,6 +78,114 @@ func Map[T, E any](list []T, f func(T) E) []E {
         r[i] = f(list[i])
     }
     return r
+}
+```
+
+### 一点不足
+
+泛型虽然出来了，但是类型推断依然不够强大，1.21有望做出[改进](https://github.com/golang/go/issues/58650)和[提升](https://github.com/golang/go/issues/59338)。
+
+```go
+// 第三个参数initial其实在函数实现里并没使用到，但是为了在调用时可以省略类型参数，所以需要这样一个参数
+// 但其实，如果类型推断足够强大的话，是可以从Finder约束的NewScanObjAndFields方法推断出R类型的
+func FindAll[S Storer, F Finder[R], R any](db S, finder F, initial R) (r []R, err error) {
+    query, args := finder.Query()
+	rows, err := db.QueryContext(context.TODO(), query, args...) // sql里select了n列
+	if err != nil {
+		return
+	}
+	defer rows.Close()
+
+	colTypes, err := rows.ColumnTypes()
+	if err != nil {
+		return
+	}
+	for rows.Next() {
+		obj, fields := finder.NewScanObjAndFields(colTypes) // fields也必须有n个元素
+		if err = rows.Scan(fields...); err != nil {
+			return
+		}
+		// PrintFields(fields)
+
+		r = append(r, *obj)
+	}
+	if err = rows.Err(); err != nil {
+		return
+	}
+
+	return
+}
+
+// 调用时需要该无用参数
+r, err := do.FindAll(tdb, finder, (UserForDB{}))
+
+// 这个才是我们想要的函数签名
+func FindAll1[S do.Storer, F do.Finder[R], R any](db S, finder F) (r []R, err error) 
+
+// 但是现在无法推断出R的类型，除非显式标明类型参数
+FindAll1(tdb, finder1) // Error: cannot infer R (/home/jd/Project/jd/tools/db/find.go:37:38)
+// 显然，如果把类型参数写出来，是非常啰嗦的
+FindAll1[*sql.DB, *finderOfUser, UserForDB](tdb, &finderOfUser{})
+
+type Finder[R any] interface {
+	Query() (query string, args []any)
+
+	NewScanObjAndFields(colTypes []*sql.ColumnType) (r *R, fields []any)
+}
+
+type Storer interface {
+	*sql.DB | *sql.Tx | *sql.Conn
+	QueryContext(ctx context.Context, query string, args ...any) (*sql.Rows, error)
+}
+```
+
+### 应用
+
+hash join:
+
+```go
+func HashJoin[K comparable, LE, RE, R any](
+    // 左表和右表
+	left []LE,
+	right []RE,
+    // 左关联函数和右关联函数，它们返回同类型键
+	lk func(item LE) K,
+	rk func(item RE) K,
+    // 接收左表元素和右表元素，返回新元素
+	mapper func(LE, RE) R,
+) []R {
+	var r = make([]R, 0, len(left))
+
+    // 先对右表做映射
+	rm := KeyBy(right, rk)
+
+	for _, le := range left {
+		k := lk(le)
+		re := rm[k]
+        // 将关联元素做处理
+		r = append(r, mapper(le, re))
+	}
+
+	return r
+}
+
+// KeyValueBy slice to map, key value specified by iteratee
+func KeyValueBy[K comparable, E, V any](collection []E, iteratee func(item E) (K, V)) map[K]V {
+	result := make(map[K]V, len(collection))
+
+	for i := range collection {
+		k, r := iteratee(collection[i])
+		result[k] = r
+	}
+
+	return result
+}
+
+// KeyBy slice to map, key specified by iteratee, value is slice element
+func KeyBy[K comparable, E any](collection []E, iteratee func(item E) K) map[K]E {
+	return KeyValueBy(collection, func(item E) (K, E) {
+		return iteratee(item), item
+	})
 }
 ```
 
