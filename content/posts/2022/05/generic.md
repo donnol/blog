@@ -13,7 +13,17 @@ tags: ['generic']
 
 # 泛型
 
-调用方除了可自行决定参数值之外，还可以自行决定参数类型。
+## 是什么？
+
+Type parameter, 类型参数。`func Add[T Number](x, y T) (r T)`，其中的`T`就是类型参数，它被接口`Number`所约束。
+
+```go
+type Number interface {
+    int | float32
+}
+```
+
+调用方除了可自行决定参数值之外，还可以自行决定参数类型。`Add[int](1, 2)`，在调用时指定`T`的类型为`int`，同时传入参数值`1`,`2`必须是`int`类型。
 
 这样使得代码更灵活，更有扩展性，同时更安全。
 
@@ -21,7 +31,15 @@ tags: ['generic']
 
 ### 为什么？
 
+静态语言，类型固定，比如这个函数：`func Add(x, y int) int`就要求参数和结果都必须是整型。
+
+那如果后来又需要一个浮点数的加法呢？
+
+![固定类型](/image/固定类型.png)
+
 那使用interface{}不也可以吗？
+
+![固定类型](/image/any类型.png)
 
 试看：
 
@@ -80,6 +98,8 @@ func Map[T, E any](list []T, f func(T) E) []E {
     return r
 }
 ```
+
+![类型参数](/image/类型参数.png)
 
 ### 一点不足
 
