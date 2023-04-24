@@ -12,8 +12,8 @@ tags: ['Join']
 ---
 
 ```go
-// nested loop, bad but common
-func Join[J, K, R any](
+// NestedJoin like nested loop join
+func NestedJoin[J, K, R any](
 	left []J,
 	right []K,
 	match func(J, K) bool,
@@ -33,8 +33,8 @@ func Join[J, K, R any](
 	return r
 }
 
-// hash join, good but specify -- must use equal condition
-func JoinByKey[K comparable, LE, RE, R any](
+// HashJoin like hash join
+func HashJoin[K comparable, LE, RE, R any](
 	left []LE,
 	right []RE,
 	lk func(item LE) K,
@@ -45,14 +45,14 @@ func JoinByKey[K comparable, LE, RE, R any](
 
 	rm := KeyBy(right, rk)
 
-	for _, j := range left {
-		k := lk(j)
+	for _, le := range left {
+		k := lk(le)
 		re := rm[k]
-		r = append(r, mapper(j, re))
+		r = append(r, mapper(le, re))
 	}
 
 	return r
 }
 ```
 
-[Code From](https://github.com/donnol/lo)
+[Code From](https://github.com/donnol/do)
