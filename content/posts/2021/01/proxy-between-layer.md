@@ -116,11 +116,24 @@ func WrapUsedTime[R any](f func() (R, error)) (R, error) {
 
 ![AOP](/image/AOP.png)
 
+那么，为什么不用中间件呢？那是因为，中间件的函数签名是固定的，参数类型、参数个数、结果类型和结果个数都是需要事先确定的。但实际中的方法是各种各样的，类型和数量都不尽相同。
+
+```go
+// 比如，http包的HandlerFunc，它的签名就是这样的，两个参数，参数类型分别如下：ResponseWriter, *Request
+type HandlerFunc func(ResponseWriter, *Request)
+
+// 而我们面临的是：
+func GetById(id uint64) (User, error)
+func ListByTime(begin, end time.Time) ([]User, error)
+```
+
 这时，如果有一个代理能帮我们拦截`store`的方法调用，在调用前后添加上耗时统计，势必能大大提升我们的工作效率。
 
 比如：
 
 ```go
+// 将函数抽象为func(args []interface{}) []interface{}，
+// 用[]interface{}来装所有的参数和结果
 func Around(f func(args []interface{}) []interface{}, args []interface{}) []interface{} {
         begin := time.Now()
         r := f(args)
@@ -132,7 +145,7 @@ func Around(f func(args []interface{}) []interface{}, args []interface{}) []inte
 
 这只是一个简单的包装函数，怎么能将它与上面的接口联系到一起呢？
 
-## [有兴趣的话，可以看这里的实现](https://github.com/donnol/tools/blob/master/inject/proxy.go)
+## [接口，Mock，Around](https://github.com/donnol/tools/blob/master/inject/proxy.go)
 
 ```go
 
@@ -395,7 +408,7 @@ func main() {
 }
 ```
 
-最后，一个既能添加通用逻辑，又能添加定制逻辑的`proxy`就完成了。
+最后，一个支持任意函数类型的、既能添加通用逻辑，又能添加定制逻辑的`proxy`就完成了。
 
 ## 对于任意函数调用通过替换ast节点来添加Proxy
 
@@ -499,6 +512,6 @@ func C() {
 }
 ```
 
-不过，这种方式会修改用户编写的源代码，不利于维护。
+不过，这种方式会修改用户编写的源代码，使用时请注意。
 
 [代码实现详见](https://github.com/donnol/tools/blob/feat/inject-proxy-caller/cmd/tbc/main.go#L404)
