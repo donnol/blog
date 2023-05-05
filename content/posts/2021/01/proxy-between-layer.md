@@ -11,7 +11,7 @@ categories: ['go']
 tags: ['aop', 'proxy']
 ---
 
-## Go实现AOP
+## Go实现AOP -- 层间代理
 
 假设有store，从数据库获取数据，其中有方法IUserStore.GetByID，传入id参数，返回用户信息:
 
@@ -61,7 +61,62 @@ func (impl userImpl) CheckUser(ctx context.Context, id int) error {
 
 但是，如果方法里调用的类似impl.userStore.GetByID的方法非常之多，逻辑非常之复杂时，这样一个一个的添加，必然非常麻烦、非常累。
 
-这时，如果有一个层间代理能帮我们拦截store的方法调用，在调用前后添加上耗时统计，势必能大大提升我们的工作效率。
+```go
+type userImpl struct {
+        userStore IUserStore
+
+        // 增加其它store
+        roleStore IRoleStore
+}
+
+func (impl userImpl) CheckUser(ctx context.Context, id int) error {
+        begin := time.Now()
+        user, err := impl.userStore.GetByID(ctx, id)
+        if err != nil {
+                return err
+        }
+        fmt.Println(time.Since(begin)) // 统计耗时
+
+        // 使用user数据做一些操作
+        _ = user
+
+        // 获取角色具体信息
+        {
+                begin := time.Now()
+                role, err := impl.roleStore.GetByID(ctx, user.RoleId)
+                if err != nil {
+                        return err
+                }
+                _ = role
+                fmt.Println(time.Since(begin)) // 统计耗时
+        }
+
+        // 可能会有更多`Store`
+}
+```
+
+可以看到，当我们新增了`roleStore`之后，如果要分别统计不同`Store`的方法调用的耗时，将会非常麻烦。这时有人会说，那为什么不把耗时统计放到`Store`的方法实现里呢？或者使用一个方法来封装耗时统计：
+
+```go
+func WrapUsedTime[R any](f func() (R, error)) (R, error) {
+        begin := time.Now()
+        r, err := f()
+        if err != nil {
+                return r, err
+        }
+        fmt.Println(time.Since(begin)) // 统计耗时
+
+        return r, nil
+}
+```
+
+这样做，当然可以。但是，依然很繁琐，特别是在业务很复杂，调用的方法很多的时候。
+
+更重要的一点是，我们应该专注于业务逻辑的开发和测试，通用的东西应该交由框架来实现。这也是`AOP`(面向切面)思想的一个很重要的观点。
+
+![AOP](/image/AOP.png)
+
+这时，如果有一个代理能帮我们拦截`store`的方法调用，在调用前后添加上耗时统计，势必能大大提升我们的工作效率。
 
 比如：
 
@@ -79,11 +134,115 @@ func Around(f func(args []interface{}) []interface{}, args []interface{}) []inte
 
 ## [有兴趣的话，可以看这里的实现](https://github.com/donnol/tools/blob/master/inject/proxy.go)
 
-可以看到，主要的方法是`Around(provider interface{}, mock interface{}, arounder Arounder) interface{}`，
-其中provider参数是类似`NewXXX() IXXX`的函数，而mock是IXXX接口的一个实现，最后的Arounder是
+```go
+
+func (impl *proxyImpl) around(provider any, mock any, arounder Arounder) any {
+	if mock == nil {
+		return provider
+	}
+
+	mockValue := reflect.ValueOf(mock)
+	mockType := mockValue.Type()
+	if mockType.Kind() != reflect.Ptr && mockType.Elem().Kind() != reflect.Struct {
+		return provider
+	}
+
+	// provider有参数，有返回值
+	pv := reflect.ValueOf(provider)
+	pvt := pv.Type()
+	if pvt.Kind() != reflect.Func {
+		panic("provider不是函数")
+	}
+
+	// 使用新的类型一样的函数
+	// 在注入的时候会被调用
+	return reflect.MakeFunc(pvt, func(args []reflect.Value) []reflect.Value {
+
+		result := pv.Call(args)
+
+		if len(result) == 0 {
+			return result
+		}
+
+		firstOut := result[0]
+		firstOutType := firstOut.Type()
+
+		if !mockType.Implements(firstOutType) {
+			panic(fmt.Errorf("mock not Implements interface"))
+		}
+
+		// 根据返回值的类型(mock)生成新的类型，其中新类型的方法均加上钩子
+		// 注意：生成的不是接口，是实现了接口的类型
+		if firstOutType.Kind() == reflect.Interface {
+
+			newValue := reflect.New(mockType.Elem()).Elem()
+			newValueType := newValue.Type()
+
+			// field设置
+			for i := 0; i < newValueType.NumField(); i++ {
+				field := newValue.Field(i)
+				fieldType := newValueType.Field(i)
+
+				var name = fieldType.Name
+				for _, suffix := range MockFieldNameSuffixes {
+					name = strings.TrimSuffix(name, suffix)
+				}
+
+				method := firstOut.MethodByName(name)
+				methodType, ok := firstOutType.MethodByName(name)
+				if !ok {
+					methodTag, ok := fieldType.Tag.Lookup("method")
+					if !ok {
+						panic(fmt.Errorf("找不到名称对应的方法"))
+					}
+					debug.Printf("tag: %+v\n", methodTag)
+					name = methodTag
+
+					method = firstOut.MethodByName(name)
+					methodType, ok = firstOutType.MethodByName(name)
+					if !ok {
+						panic(fmt.Errorf("使用tag也找不到名称对应的方法"))
+					}
+				}
+				debug.Printf("method: %+v\n", method)
+
+				pctx := ProxyContext{
+					PkgPath:       firstOutType.PkgPath(),
+					InterfaceName: firstOutType.Name(),
+					MethodName:    methodType.Name,
+				}
+				debug.Printf("pctx: %+v\n", pctx)
+
+				// newMethod会在实际请求时被调用
+				// 当被调用时，newMethod内部就会调用绑定好的Arounder，然后将原函数method和参数args传入
+				// 在Around方法执行完后即可获得结果
+				newMethod := reflect.MakeFunc(methodType.Type, func(args []reflect.Value) []reflect.Value {
+					var result []reflect.Value
+
+					debug.Printf("args: %+v\n", args)
+
+					// Around是对整个结构的统一包装，如果需要对不同方法做不同处理，可以根据pctx里的方法名在Around接口的实现里做处理
+					result = arounder.Around(pctx, method, args)
+
+					debug.Printf("result: %+v\n", result)
+
+					return result
+				})
+
+				field.Set(newMethod)
+			}
+
+			result[0] = newValue.Addr().Convert(firstOutType)
+		}
+
+		return result
+	}).Interface()
+}
+```
+
+可以看到，主要的方法是`around(provider interface{}, mock interface{}, arounder Arounder) interface{}`，
+其中`provider`参数是类似`NewXXX() IXXX`的函数，而`mock`是`IXXX接口`的一个实现，最后的`Arounder`是
 拥有方法`Around(pctx ProxyContext, method reflect.Value, args []reflect.Value) []reflect.Value`的接口。
-
-
 
 ## [这里的示例](https://github.com/donnol/tools/blob/master/inject/proxy_test.go)
 
@@ -95,7 +254,13 @@ type UserSrvMock struct {
 }
 ```
 
-所以，为了提升开发效率，我还写了一个[工具](https://github.com/donnol/tools)，用来根据接口生成相应的mock结构体。
+所以，为了提升开发效率，我还写了一个[工具](https://github.com/donnol/tools)，用来根据接口生成相应的`mock`结构体。
+
+> 安装：`go install github.com/donnol/tools/cmd/tbc@latest`.
+>
+> 使用：`tbc mock -p=github.com/dominikbraun/graph --mode=offsite`.
+>
+> 上述命令会解析`graph`包，获取包里的公开接口，然后生成对应的`Mock`结构体，生成的代码保存在当前目录的`mock.go`文件里。
 
 ## 代码生成替代反射
 
@@ -280,9 +445,6 @@ func C() {
 如果，我能生成一个`AProxy`函数，里面包含有耗时统计等逻辑，再把`C`对`A`的调用改为对`Aproxy`的调用，是不是就非常方便了呢！
 
 ```sh
-# 安装工具
-go install github.com/donnol/tools/cmd/tbc@master
-
 # 执行命令，生成代码
 tbc genproxy -p ./parser/testtype/proxy/ --func A
 ```
@@ -336,5 +498,7 @@ func C() {
 	log.Printf("r1: %v\n", r1)
 }
 ```
+
+不过，这种方式会修改用户编写的源代码，不利于维护。
 
 [代码实现详见](https://github.com/donnol/tools/blob/feat/inject-proxy-caller/cmd/tbc/main.go#L404)
