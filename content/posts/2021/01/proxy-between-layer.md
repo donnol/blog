@@ -291,11 +291,18 @@ func (impl *proxyImpl) around(provider any, mock any, arounder Arounder) any {
 
 ```go
 type UserSrvMock struct {
-	CheckUserFunc func(ctx context.Context, id int) error
+	CheckUserFunc func(ctx context.Context, id int) error // 通过配置CheckUserFunc字段的值来指定要附加的行为
 }
+
+func (mock *UserSrvMock) CheckUser(ctx context.Context, id int) error {
+	return mock.CheckUserFunc(ctx, id)
+}
+
+// UserSrvMock 实现了IUserSrv接口
+var _ IUserSrv = (*UserSrvMock)(nil)
 ```
 
-所以，为了提升开发效率，我还写了一个[工具](https://github.com/donnol/tools)，用来根据接口生成相应的`mock`结构体。
+当然，这里需要一个[工具](https://github.com/donnol/tools)，用来根据接口生成相应的`mock`结构体。
 
 > 安装：`go install github.com/donnol/tools/cmd/tbc@latest`.
 >
