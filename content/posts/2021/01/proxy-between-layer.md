@@ -558,3 +558,56 @@ func C() {
 不过，这种方式会修改用户编写的源代码，使用时请注意。
 
 [代码实现详见](https://github.com/donnol/tools/blob/feat/inject-proxy-caller/cmd/tbc/main.go#L404)
+
+## 最后
+
+把任意函数调用包起来，即可按需添加额外逻辑。
+
+### 函数、方法、接口
+
+接口包含方法；
+
+方法变函数：把receiver放到函数的首个参数上；
+
+函数变方法：新建类型；
+
+[函数变接口：无需新建类型，类型转换为单方法接口--这是一个未实现的提案](https://github.com/golang/go/issues/47487)；
+
+例如，我们要给`io.Writer`添加计数功能：
+
+```go
+// 1 新建类型：这是目前支持的写法，相当多的模板代码
+type countingWriter struct {
+    w io.Writer
+    n int64
+}
+
+func (w *countingWriter) Write(p []byte) (n int, err error) {
+    n, err = w.w.Write(p)
+    w.n += int64(n)
+    return n, err
+}
+
+func main() {
+    cw := &countingWriter{w: os.Stdout}
+    // write things to cw
+    fmt.Println(cw.n, "bytes written")
+}
+
+// 2 无需新建类型：这是提案想达到的效果
+func main() {
+    var N int64
+
+	// 直接将函数转型为接口
+    cw := io.Writer(func(p []byte) (n int, err error) {
+        n, err = os.Stdout.Write(p)
+        N += int64(n)
+        return n, err
+    })
+
+    // write things to cw
+    fmt.Println(N, "bytes written")
+}
+```
+
+如果这个提案最终被实现，那么我们可以认为**任意函数都能被视为某个接口来使用**，再结合上面基于接口的代理机制，可以做到对任意函数的代理。
