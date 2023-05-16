@@ -59,3 +59,17 @@ connect_timeout = 10
 关闭防火墙或者配置规则允许端口通过。
 
 在`wsl2`机器上访问：`mysql -h 172.20.96.1 -P 6446 -uroot -p`，即可访问到`172.17.39.239:3306`机器上的数据库服务。
+
+## 问题
+
+报错：`Error: Loading plugin... 找不到指定的程序。`
+
+```sh
+mysqlrouter -c D:\Data\mysqlrouter\etc\mysqlrouter.conf
+Error: Loading plugin for config-section '[routing:primary]' failed: D:/Data/mysqlrouter/lib/routing.dll: 找不到指定的程序。
+PS D:\Project> 
+PS D:\Project> mysqlrouter_plugin_info D:/Data/mysqlrouter/lib/routing.dll routing
+[ERROR] Could not load plugin file 'D:/Data/mysqlrouter/lib/routing.dll': 找不到指定的程序。
+```
+
+解决：需要将`plugin_folder`配置的值改为`mysqlrouter安装路径下的目录`。
