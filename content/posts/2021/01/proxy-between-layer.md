@@ -155,6 +155,8 @@ func GetById(id uint64) (User, error)
 func ListByTime(begin, end time.Time) ([]User, error)
 ```
 
+当然，如果是自己项目的代码，统一约束函数签名也不是不行，但如果要在对第三方库的调用也加上这段逻辑呢？
+
 这时，如果有一个代理能帮我们拦截`store`的方法调用，在调用前后添加上耗时统计，势必能大大提升我们的工作效率。
 
 比如：
@@ -176,7 +178,7 @@ func Around(f func(args []interface{}) []interface{}, args []interface{}) []inte
 ## [接口，Mock，Around](https://github.com/donnol/tools/blob/master/inject/proxy.go)
 
 ```go
-
+// 使用mock和arounder对传入的provider进行包装，返回包装后的新的provider，新的provider在被调用时返回的对象与旧provider返回的对象同样实现了同一个接口；新provider返回的对象就是mock结构体的实例
 func (impl *proxyImpl) around(provider any, mock any, arounder Arounder) any {
 	if mock == nil {
 		return provider
@@ -281,9 +283,13 @@ func (impl *proxyImpl) around(provider any, mock any, arounder Arounder) any {
 }
 ```
 
-可以看到，主要的方法是`around(provider interface{}, mock interface{}, arounder Arounder) interface{}`，
-其中`provider`参数是类似`NewXXX() IXXX`的函数，而`mock`是`IXXX接口`的一个实现，最后的`Arounder`是
-拥有方法`Around(pctx ProxyContext, method reflect.Value, args []reflect.Value) []reflect.Value`的接口。
+可以看到，主要的方法是: `around(provider interface{}, mock interface{}, arounder Arounder) interface{}`，
+
+其中`provider`参数是类似`NewXXX() IXXX`的函数，
+
+`mock`是`IXXX接口`的一个实现，
+
+最后的`Arounder`是拥有方法`Around(pctx ProxyContext, method reflect.Value, args []reflect.Value) []reflect.Value`的接口。
 
 ## [这里的示例](https://github.com/donnol/tools/blob/master/inject/proxy_test.go)
 
@@ -429,12 +435,12 @@ func main() {
 	RegisterProxyMethod(UserSrvMockCheckUserProxyContext, func(ctx ProxyContext, method any, args []any) (res []any) {
 		log.Printf("custom call")
 
-                // 从any断言回具体的函数、参数
+		// 从any断言回具体的函数、参数
 		f := method.(func(ctx context.Context, id int) error)
 		a0 := args[0].(context.Context)
-                a1 := args[1].(id)
+		a1 := args[1].(id)
 
-                // 调用
+		// 调用
 		r1 := f(a0, a1)
 		res = append(res, r1)
 
@@ -444,6 +450,8 @@ func main() {
 ```
 
 最后，一个支持任意函数类型的、既能添加通用逻辑，又能添加定制逻辑的`proxy`就完成了。
+
+我们还留意到，在`RegisterProxyMethod`注入函数时，我们除了可以在函数调用前后新增逻辑，还可以把函数调用改为任意调用，比如接口调用。
 
 ## 对于任意函数调用通过替换ast节点来添加Proxy
 
