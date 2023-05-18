@@ -73,3 +73,29 @@ PS D:\Project> mysqlrouter_plugin_info D:/Data/mysqlrouter/lib/routing.dll routi
 ```
 
 解决：需要将`plugin_folder`配置的值改为`mysqlrouter安装路径下的目录`。
+
+## 其它代理
+
+如果只是针对`mysql`，则使用`mysqlrouter`即可，但如果还有其它服务，则还不够。
+
+这时，可以使用[`goproxy`](https://github.com/snail007/goproxy)。
+
+注意，这个项目的源码不是最新的（直接使用基于源码构建出来的`proxy`会有与文档不一致的表现），需要去[下载](https://github.com/snail007/goproxy/releases)最新的二进制执行文件.
+
+解压后执行，即可启动代理，如下述命令将启动一个代理，其监听本地`33080`端口，并将请求转发到`172.17.39.239:3306`目标机器：
+
+```sh
+.\proxy.exe tcp -p ":33080" -T tcp -P "172.17.39.239:3306"
+```
+
+### 访问sqlserver
+
+通过代理(不同的端口)连接`172.17.39.239`机器上的`sqlserver`:
+
+```sh
+.\proxy.exe tcp -p ":33081" -T tcp -P "172.17.39.239:1433"
+```
+
+### 加密
+
+如果要生成密钥，必须在`linux`环境下使用`proxy keygen`生成密钥(在`windows`环境里会报错)。
