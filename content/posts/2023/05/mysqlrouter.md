@@ -78,6 +78,8 @@ PS D:\Project> mysqlrouter_plugin_info D:/Data/mysqlrouter/lib/routing.dll routi
 
 如果只是针对`mysql`，则使用`mysqlrouter`即可，但如果还有其它服务，则还不够。
 
+### goproxy
+
 这时，可以使用[`goproxy`](https://github.com/snail007/goproxy)。
 
 注意，这个项目的源码不是最新的（直接使用基于源码构建出来的`proxy`会有与文档不一致的表现），需要去[下载](https://github.com/snail007/goproxy/releases)最新的二进制执行文件.
@@ -99,3 +101,17 @@ PS D:\Project> mysqlrouter_plugin_info D:/Data/mysqlrouter/lib/routing.dll routi
 ### 加密
 
 如果要生成密钥，必须在`linux`环境下使用`proxy keygen`生成密钥(在`windows`环境里会报错)。
+
+### 自定义tcp代理
+
+[地址](`github.com/donnol/do/cmd/letgo`).
+
+> 下载源码：git clone git@github.com:donnol/do.git
+>
+> 安装: go install ./cmd/letgo
+>
+> 使用: letgo proxy --remoteAddr="172.17.39.239:3306"
+
+默认监听端口`54388`，将收到的数据转发到指定的地址：`172.17.39.239:3306`。
+
+可通过监听不同的端口转发数据到不同的地址。
