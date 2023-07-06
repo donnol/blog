@@ -1,3 +1,15 @@
+---
+author: "jdlau"
+date: 2023-07-06
+linktitle: Prometheus start failed
+menu:
+next:
+prev:
+title: Prometheus start failed
+weight: 10
+categories: ['Prometheus']
+tags: ['Prometheus']
+---
 
 ## Question
 
