@@ -1,11 +1,11 @@
 ---
 author: "jdlau"
 date: 2023-10-18
-linktitle: `Mysql 8.0.33`在使用窗口函数的同时不能用`count(distinct *)`
+linktitle: Mysql 8.0.33在使用窗口函数的同时不能用count(distinct *)
 menu:
 next:
 prev:
-title: `Mysql 8.0.33`在使用窗口函数的同时不能用`count(distinct *)`
+title: Mysql 8.0.33在使用窗口函数的同时不能用count(distinct *)
 weight: 10
 categories: ['Mysql 8']
 tags: ['mark']
