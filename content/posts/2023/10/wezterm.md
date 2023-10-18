@@ -1,11 +1,11 @@
 ---
 author: "jdlau"
 date: 2023-10-17
-linktitle: `Wezterm`极简配置文件
+linktitle: Wezterm极简配置文件
 menu:
 next:
 prev:
-title: `Wezterm`极简配置文件
+title: Wezterm极简配置文件
 weight: 10
 categories: ['Rust', 'Wezterm']
 tags: ['mark']
