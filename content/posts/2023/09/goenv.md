@@ -1,11 +1,11 @@
 ---
 author: "jdlau"
 date: 2023-09-13
-linktitle: Vscode go: cannot find GOROOT directory
+linktitle: Vscode go cannot find GOROOT directory
 menu:
 next:
 prev:
-title: Vscode go: cannot find GOROOT directory
+title: Vscode go cannot find GOROOT directory
 weight: 10
 categories: ['Go', 'Vscode']
 tags: ['mark']
