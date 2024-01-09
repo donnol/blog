@@ -9,6 +9,7 @@
             "tpl",
             "tmpl",
         ],
+        "ui.semanticTokens": true
     },
     "files.associations": {
         "*.tpl": "gotmpl",
