@@ -1,6 +1,8 @@
 pub mod tree;
 use crate::tree::tree::{new_tree, Treer};
 
+mod bindings;
+
 #[tokio::main]
 async fn main() {
     // 要想在main使用async，必须在上面加上tokio::main属性，并且引入带"rt-multi-thread", "macros"特性的tokio库
@@ -36,6 +38,10 @@ async fn main() {
 
     println!("block: {}", block());
     println!("join: {:?}", block_on(join()));
+
+    unsafe {
+        bindings::shift_left(1, 2);
+    }
 }
 
 const fn add(x: u8, y: u8) -> u8 {
