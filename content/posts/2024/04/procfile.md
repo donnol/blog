@@ -1,5 +1,7 @@
 ls /proc/58607
 
+[manual](https://man7.org/linux/man-pages/man5/proc.5.html)
+
 |文件名| 内容 | 是否需要root权限 | 说明 |
 |--|--|--|--|
 | arch_status | 空 | | |
