@@ -134,3 +134,19 @@ func Solution5(n int) []int {
 	}
 	return r
 }
+
+func Solution6(n int) []int {
+	result := make([]int, n)
+	var highBig = 0
+	for i := 1; i < n; i++ {
+		// 去除最高位的1需要减去的值
+		if i&(i-1) == 0 { // 2的幂
+			highBig = i
+		}
+
+		// i的1个数就等于 (i - highBig)的个数 + 1
+		result[i] = result[i-highBig] + 1
+	}
+
+	return result
+}

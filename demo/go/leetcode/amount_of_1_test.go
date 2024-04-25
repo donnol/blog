@@ -232,6 +232,51 @@ func BenchmarkSolution5(b *testing.B) {
 	}
 }
 
+func TestSolution6(t *testing.T) {
+	type args struct {
+		n int
+	}
+	tests := []struct {
+		name string
+		args args
+		want []int
+	}{
+		{
+			name: "1",
+			args: args{
+				n: 10,
+			},
+			want: []int{
+				0, 1, 1, 2, 1, 2, 2, 3, 1, 2,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := Solution6(tt.args.n); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Solution() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func BenchmarkSolution6(b *testing.B) {
+	// go test -benchmem -run=^$ -tags linux -bench ^BenchmarkSolution$ github.com/donnol/blog/demo/go/leetcode -v
+
+	// goos: linux
+	// goarch: amd64
+	// pkg: github.com/donnol/blog/demo/go/leetcode
+	// cpu: Intel(R) Core(TM) i7-8700 CPU @ 3.20GHz
+	// BenchmarkSolution6
+	// BenchmarkSolution6-12    	28875668	        39.14 ns/op	      80 B/op	       1 allocs/op
+	// PASS
+	// ok  	github.com/donnol/blog/demo/go/leetcode	1.179s
+
+	for i := 0; i < b.N; i++ {
+		Solution6(10)
+	}
+}
+
 func TestShift(t *testing.T) {
 
 	a := 0b1
