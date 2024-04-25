@@ -116,3 +116,21 @@ func amountOf1V4(i uint32) (r int) {
 func IsPowerOf2(n int) bool {
 	return n&(n-1) == 0
 }
+
+// leetcode 338 原题，动态规划的转移方程：bits[i] = bits[i >> 1] + (i & 1)。
+// 它的题解需要用n+1个元素的数组，我这里为了跟上面保持一致，就用n了
+func Solution5(n int) []int {
+	r := make([]int, n)
+	for i := 0; i < n; i++ {
+		if i == 0 {
+			continue
+		}
+		if i <= 2 {
+			r[i] = 1
+			continue
+		}
+
+		r[i] = r[i>>1] + (i & 1)
+	}
+	return r
+}
