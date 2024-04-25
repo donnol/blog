@@ -104,19 +104,7 @@ func Solution4(n int) []int {
 			continue
 		}
 
-		// 怎么利用上一个数字的结果呢？
-		_ = r[i-1]
-
-		ii := i
-		for {
-			if ii&0b1 != 0 {
-				r[i]++
-			}
-			ii >>= 1
-			if ii == 0 {
-				break
-			}
-		}
+		r[i] = amountOf1V4(uint32(i))
 	}
 	return r
 }
@@ -124,7 +112,10 @@ func Solution4(n int) []int {
 var _ = amountOf1V4
 
 func amountOf1V4(i uint32) (r int) {
-
+	for i != 0 {
+		i &= i - 1
+		r++
+	}
 	return
 }
 

@@ -178,9 +178,9 @@ func BenchmarkSolution4(b *testing.B) {
 	// pkg: github.com/donnol/blog/demo/go/leetcode
 	// cpu: Intel(R) Core(TM) i7-8700 CPU @ 3.20GHz
 	// BenchmarkSolution4
-	// BenchmarkSolution4-12    	24920805	        50.17 ns/op	      80 B/op	       1 allocs/op
+	// BenchmarkSolution4-12    	21492500	        51.69 ns/op	      80 B/op	       1 allocs/op
 	// PASS
-	// ok  	github.com/donnol/blog/demo/go/leetcode	1.306s
+	// ok  	github.com/donnol/blog/demo/go/leetcode	1.176s
 
 	for i := 0; i < b.N; i++ {
 		Solution4(10)
