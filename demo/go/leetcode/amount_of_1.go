@@ -77,6 +77,8 @@ func Solution3(n int) []int {
 	return r
 }
 
+var _ = amountOf1V3
+
 func amountOf1V3(i int) (r int) {
 	for {
 		if i&0b1 != 0 {
