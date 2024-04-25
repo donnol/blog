@@ -62,14 +62,11 @@ func Solution3(n int) []int {
 		// (1)与0b1位与，当结果不为0，则表明数字的最后一位是1
 		// (2)再把数字向右移一位，继续(1)，直到数字为0
 		ii := i
-		for {
+		for ii != 0 {
 			if ii&0b1 != 0 {
 				sr++
 			}
 			ii >>= 1
-			if ii == 0 {
-				break
-			}
 		}
 
 		r[i] = sr
@@ -80,14 +77,11 @@ func Solution3(n int) []int {
 var _ = amountOf1V3
 
 func amountOf1V3(i int) (r int) {
-	for {
+	for i != 0 {
 		if i&0b1 != 0 {
 			r++
 		}
 		i >>= 1
-		if i == 0 {
-			break
-		}
 	}
 
 	return
