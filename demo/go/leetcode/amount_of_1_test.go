@@ -3,6 +3,8 @@ package leetcode
 import (
 	"reflect"
 	"testing"
+
+	"github.com/donnol/do"
 )
 
 func TestSolution(t *testing.T) {
@@ -146,7 +148,5 @@ func TestShift(t *testing.T) {
 	t.Logf("%d, %06b; %b", a, a, a<<62)
 
 	r := amountOf1V3(5)
-	if r != 2 {
-		t.Errorf("bad case, %v != %v", r, 2)
-	}
+	do.Assert(t, r, 2)
 }
