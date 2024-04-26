@@ -43,3 +43,11 @@ func (p *User) WithRelation(roleIds []do.Id, orgId, postId do.Id) {
 // 	p.Created = item.CreateTime
 // 	p.Phone = item.Phone
 // }
+
+type UserParam struct {
+	User
+}
+
+type UserResult struct {
+	User User
+}

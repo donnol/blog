@@ -52,3 +52,39 @@ func TestFromTable(t *testing.T) {
 
 	}
 }
+
+func TestFromTable2(t *testing.T) {
+	item := UserTable{
+		Id:         1,
+		Name:       "jd",
+		CreateTime: "2024-04-26",
+		Phone:      "115",
+	}
+	roleIds := []do.Id{1}
+	orgId := do.Id(1)
+	postId := do.Id(1)
+
+	var e UserParam
+	e.User.FromTable(item)
+	e.User.WithRelation(roleIds, orgId, postId)
+	do.Assert(t, e.User.Id, item.Id)
+	do.Assert(t, e.User.Name, item.Name)
+	do.Assert(t, e.User.Created, item.CreateTime)
+	do.Assert(t, e.User.Phone, item.Phone)
+	do.AssertSlice(t, e.User.RoleIds, roleIds)
+	do.Assert(t, e.User.OrgId, orgId)
+	do.Assert(t, e.User.PostId, postId)
+
+	{
+		var e UserResult
+		e.User.FromTable(item)
+		e.User.WithRelation(roleIds, orgId, postId)
+		do.Assert(t, e.User.Id, item.Id)
+		do.Assert(t, e.User.Name, item.Name)
+		do.Assert(t, e.User.Created, item.CreateTime)
+		do.Assert(t, e.User.Phone, item.Phone)
+		do.AssertSlice(t, e.User.RoleIds, roleIds)
+		do.Assert(t, e.User.OrgId, orgId)
+		do.Assert(t, e.User.PostId, postId)
+	}
+}
