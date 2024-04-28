@@ -38,16 +38,18 @@ func next(pattern string) []int {
 	now := 0
 
 	for x < len(pattern) {
-		if pattern[now] == pattern[x] {
+		// fmt.Printf("%s, %s, %v\n", string(pattern[now]), string(pattern[x]), r)
+		if pattern[now] == pattern[x] { // 前后字符相同时，齐齐向前走
 			now += 1
 			x += 1
 			r = append(r, now)
-		} else if now != 0 {
+		} else if now != 0 { // 前后字符不同，并且前面出现过相同字符，往前倒车
 			now = r[now-1]
 		} else {
-			r = append(r, 0)
+			r = append(r, 0) // 前后字符不同，并且能倒都倒了
 			x += 1
 		}
+		// fmt.Println(r)
 	}
 
 	return r

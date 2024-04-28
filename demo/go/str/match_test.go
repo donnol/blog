@@ -3,7 +3,42 @@ package str
 import (
 	"strings"
 	"testing"
+
+	"github.com/donnol/do"
 )
+
+func TestNext(t *testing.T) {
+	ns := next("ddffeeffdd")
+	do.AssertSlice(t, ns, []int{0, 1, 0, 0, 0, 0, 0, 0, 1, 2})
+
+	// 一样的
+	{
+		ns := next("dddd")
+		do.AssertSlice(t, ns, []int{0, 1, 2, 3})
+	}
+	// 不存在一样的
+	{
+		ns := next("dfeg")
+		do.AssertSlice(t, ns, []int{0, 0, 0, 0})
+	}
+	// 存在一样，但没有公共前后缀的
+	{
+		ns := next("dffg")
+		do.AssertSlice(t, ns, []int{0, 0, 0, 0})
+	}
+	// 存在一样，有公共前后缀的
+	{
+		ns := next("dffd")
+		// df -> d; f
+		// dff -> d, df; ff, f
+		// dffd -> d, df, dff; ffd, fd, d
+		do.AssertSlice(t, ns, []int{0, 0, 0, 1})
+	}
+	{
+		ns := next("ababac")
+		do.AssertSlice(t, ns, []int{0, 0, 1, 2, 3, 0})
+	}
+}
 
 func TestIndex(t *testing.T) {
 	type args struct {
