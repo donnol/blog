@@ -1,5 +1,7 @@
 package leetcode
 
+import "fmt"
+
 // 每增加一个数组都有可能改变之前的交集
 func intersectionSizeTwo(intervals [][]int) int {
 	if len(intervals) == 0 {
@@ -16,6 +18,17 @@ func intersectionSizeTwo(intervals [][]int) int {
 
 		curr = next
 	}
+
+	seen := make(map[int]int) // 数字出现的次数
+	for i := 0; i < len(intervals); i++ {
+		for j := intervals[i][0]; j <= intervals[i][1]; j++ {
+			if seen[j] >= 1 {
+				nums = append(nums, j)
+			}
+			seen[j]++
+		}
+	}
+	fmt.Println(seen)
 
 	return len(nums)
 }
