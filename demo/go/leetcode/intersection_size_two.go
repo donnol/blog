@@ -19,6 +19,11 @@ func intersectionSizeTwo(intervals [][]int) int {
 		curr = next
 	}
 
+	// 记录数字出现次数，不小于2表示该数字为交集
+	// 若交集数字够数，则返回
+	// 若交集数字不够，则从各组数字取非交集数字，直到够数
+	// 但数量并不确定，怎么知道何时够数呢？
+
 	seen := make(map[int]int) // 数字出现的次数
 	for i := 0; i < len(intervals); i++ {
 		for j := intervals[i][0]; j <= intervals[i][1]; j++ {
