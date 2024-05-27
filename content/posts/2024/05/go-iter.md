@@ -65,6 +65,12 @@ func main() {
 
 	// 函数body会被转为yield函数传入到iter.Seq里 -- 当`body`没有控制流语句时，一律视为`return true`
 	for k := range count(10) {
+		// 请注意，这里的defer不会被移入yield函数里，而是会保留在本函数内
+		defer func() {
+			fmt.Println("defer2", k)
+		}()
+		defer fmt.Println("defer", k)
+
 		fmt.Println(k)
 	}
 
@@ -78,3 +84,5 @@ func main() {
 }
 
 ```
+
+[range over func的defer说明](https://go.googlesource.com/go/+/refs/changes/41/510541/7/src/cmd/compile/internal/rangefunc/rewrite.go)
