@@ -22,6 +22,7 @@ require (
 	github.com/golang-sql/sqlexp v0.1.0 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.4 // indirect
+	github.com/sergi/go-diff v1.3.1 // indirect
 	github.com/smallnest/chanx v1.2.0 // indirect
 	golang.org/x/crypto v0.17.0 // indirect
 	golang.org/x/mod v0.14.0 // indirect
@@ -29,6 +30,7 @@ require (
 )
 
 require (
+	github.com/andreyvit/diff v0.0.0-20170406064948-c7f18ee00883
 	github.com/donnol/do v1.10.0
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/traefik/yaegi v0.15.1

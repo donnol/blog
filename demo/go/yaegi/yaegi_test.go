@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/andreyvit/diff"
+	"github.com/donnol/do"
 	"github.com/traefik/yaegi/interp"
 	"github.com/traefik/yaegi/stdlib"
 )
@@ -153,4 +155,36 @@ func FactorialBig(n int) string {
 			fmt.Printf("v: %+v\n", v.String())
 		}
 	}
+}
+
+func TestGin(t *testing.T) {
+	src := `
+	package main
+
+	import (
+		"fmt"
+		"github.com/gin-gonic/gin"
+	)
+	
+	func main() {
+		fmt.Println("Hello from Yaegi!")
+	
+		router := gin.Default()
+		router.GET("/ping", func(c *gin.Context) {
+			c.JSON(200, gin.H{
+				"message": "pong",
+			})
+		})
+		router.Run(":8080")
+	}	
+	`
+
+	i := interp.New(interp.Options{})
+	i.Use(stdlib.Symbols) // 引入标准库
+
+	_, err := i.Eval(src)
+
+	// 因为未引入gin库，所以会报错：
+	want := `6:3: import "github.com/gin-gonic/gin" error: unable to find source related to: "github.com/gin-gonic/gin". Either the GOPATH environment variable, or the Interpreter.Options.GoPath needs to be set`
+	do.Assert(t, err.Error(), want, diff.LineDiff(err.Error(), want))
 }
