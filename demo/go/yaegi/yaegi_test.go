@@ -8,6 +8,7 @@ import (
 	"github.com/donnol/do"
 	"github.com/traefik/yaegi/interp"
 	"github.com/traefik/yaegi/stdlib"
+	"github.com/traefik/yaegi/stdlib/unsafe"
 )
 
 func TestYaegi(t *testing.T) {
@@ -179,12 +180,37 @@ func TestGin(t *testing.T) {
 	}	
 	`
 
-	i := interp.New(interp.Options{})
-	i.Use(stdlib.Symbols) // 引入标准库
+	t.Run("未指定gopath", func(t *testing.T) {
+		i := interp.New(interp.Options{})
+		i.Use(stdlib.Symbols) // 引入标准库
 
-	_, err := i.Eval(src)
+		_, err := i.Eval(src)
 
-	// 因为未引入gin库，所以会报错：
-	want := `6:3: import "github.com/gin-gonic/gin" error: unable to find source related to: "github.com/gin-gonic/gin". Either the GOPATH environment variable, or the Interpreter.Options.GoPath needs to be set`
-	do.Assert(t, err.Error(), want, diff.LineDiff(err.Error(), want))
+		// 因为未引入gin库，所以会报错：
+		want := `6:3: import "github.com/gin-gonic/gin" error: unable to find source related to: "github.com/gin-gonic/gin". Either the GOPATH environment variable, or the Interpreter.Options.GoPath needs to be set`
+		do.Assert(t, err.Error(), want, diff.LineDiff(err.Error(), want))
+	})
+
+	t.Run("指定gopath但库不存在", func(t *testing.T) {
+		i := interp.New(interp.Options{GoPath: "/home/jd/go1"})
+		i.Use(stdlib.Symbols) // 引入标准库
+
+		_, err := i.Eval(src)
+		want := `6:3: import "github.com/gin-gonic/gin" error: unable to find source related to: "github.com/gin-gonic/gin"`
+		do.Assert(t, err.Error(), want, diff.LineDiff(err.Error(), want))
+	})
+
+	t.Run("生成库符号并使用", func(t *testing.T) {
+		i := interp.New(interp.Options{
+			// GoPath: "/home/jd/go",
+		})
+		i.Use(stdlib.Symbols) // 引入标准库
+		i.Use(unsafe.Symbols) // 支持unsafe
+		i.Use(Symbols)        // 先在本目录go get github.com/gin-gonic/gin, 然后yaegi extract github.com/gin-gonic/gin生成符号，再Use
+
+		_, err := i.Eval(src)
+		if err != nil {
+			t.Error(err)
+		}
+	})
 }
