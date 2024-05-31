@@ -187,6 +187,46 @@ func BenchmarkSolution4(b *testing.B) {
 	}
 }
 
+func Test_amountOf1V4(t *testing.T) {
+	for _, tt := range []struct {
+		n    uint32
+		want int
+	}{
+		{
+			n:    10000,
+			want: 5,
+		},
+		{
+			n:    10000000,
+			want: 8,
+		},
+		{
+			n:    1000000000,
+			want: 13,
+		},
+	} {
+		r := amountOf1V4(tt.n)
+		do.Assert(t, r, tt.want)
+	}
+}
+
+func Benchmark_amountOf1V4(b *testing.B) {
+	// go test -benchmem -run=^$ -tags linux -bench ^Benchmark_amountOf1V4$ github.com/donnol/blog/demo/go/leetcode -v
+
+	// goos: linux
+	// goarch: amd64
+	// pkg: github.com/donnol/blog/demo/go/leetcode
+	// cpu: Intel(R) Core(TM) i7-8700 CPU @ 3.20GHz
+	// Benchmark_amountOf1V4
+	// Benchmark_amountOf1V4-12    	189971991	         6.462 ns/op	       0 B/op	       0 allocs/op
+	// PASS
+	// ok  	github.com/donnol/blog/demo/go/leetcode	1.872s
+
+	for i := 0; i < b.N; i++ {
+		amountOf1V4(uint32(i))
+	}
+}
+
 func TestSolution5(t *testing.T) {
 	type args struct {
 		n int
