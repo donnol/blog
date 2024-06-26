@@ -66,9 +66,21 @@ net start mysql
 
 ```sh
 [数据库目录]
-#ib_16384_0.dblwr
+#ib_16384_0.dblwr # Doublewrite Buffer (内存+磁盘), 新的DBLWR以及它如何帮助解决历史上MySQL性能问题
 #ib_16384_1.dblwr
-ib_fubber_pool
-ibdata1
-mysql.ibd
+auto.cnf # 记录mysql数据库实例的server_uuid，安装的时候初始化,master和slave的server_uuid不能一样
+ib_fubber_pool # 缓存池，存放部分最近的查询记录和索引等，可以通过show variables like 'innodb%pool%'查
+ibdata1 # innodb表空间,如果采用innodb引擎，会默认10M大小
+mysql.ibd # innodb存储引擎的数据文件
 ```
+
+## 双写
+
+[official](https://dev.mysql.com/doc/refman/8.4/en/innodb-doublewrite-buffer.html)
+
+Double Write由两部分组成；一部分是内存中的double write buffer，其大小为2M。另一部分由共享表空间(ibdata)中连续的128页，即2个区组成，大小也是2M。
+其刷盘流程为：
+
+- 当多个数据页需要进行刷盘时，并不直接写入到磁盘的物理文件中，而是先拷贝到内存中的double write buffer中。
+- 接着从double write buffer中分两次写入到磁盘的共享表空间中(连续存储，顺序写，性能很高)，每次写1M。
+- 等第二步完成后，再将double write buffer中的脏页数据写入到实际的各个表空间中(离散写)
