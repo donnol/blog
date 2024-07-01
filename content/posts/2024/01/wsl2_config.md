@@ -148,3 +148,14 @@ WantedBy=default.target
 [experimental]
 autoMemoryReclaim=gradual # 检测空闲 CPU 使用率后，自动释放缓存的内存。 设置为 gradual 以慢速释放，设置为 dropcache 以立即释放缓存的内存。
 ```
+
+## wsl2 filesystem performance
+
+```sh
+$ dd if=/dev/zero of=/mnt/e/testfile bs=1M count=1000
+1000+0 records in
+1000+0 records out
+1048576000 bytes (1.0 GB, 1000 MiB) copied, 3.88478 s, 270 MB/s
+```
+
+[issues](https://github.com/microsoft/WSL/issues/4197)
