@@ -80,6 +80,23 @@ config.mouse_bindings = {  -- Paste on right-click
     }
 }
 
+config.keys = {
+    -- 使用 Ctrl+n 来新建标签页，而不是 Ctrl+Shift+T
+    { key = "n",          mods = "ALT", action = wezterm.action { SpawnTab = "DefaultDomain" } },
+    -- 使用 Alt+左右箭头来切换标签页
+    { key = "LeftArrow",  mods = "ALT", action = wezterm.action { ActivateTabRelative = -1 } },
+    { key = "RightArrow", mods = "ALT", action = wezterm.action { ActivateTabRelative = 1 } },
+}
+
+-- 定义 Alt+数字 切换到对应标签页的快捷键
+for i = 1, 9 do
+    table.insert(config.keys, {
+        key = tostring(i),
+        mods = 'ALT',
+        action = wezterm.action.ActivateTab(i - 1),
+    })
+end
+
 -- and finally, return the configuration to wezterm
 return config
 
