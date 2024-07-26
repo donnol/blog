@@ -36,7 +36,7 @@ func convert(s string, numRows int) string {
 	l := len(s)
 	equo := make([][]byte, numRows)
 	for i := 0; i < numRows; i++ {
-		equo[i] = make([]byte, l)
+		equo[i] = make([]byte, 0, l/2)
 	}
 	// defer func() {
 	// 	print(equo)
@@ -49,7 +49,7 @@ func convert(s string, numRows int) string {
 		e := s[i]
 
 		if cn == 0 {
-			equo[rn][j] = e
+			equo[rn] = append(equo[rn], e)
 			rn++
 			if rn >= numRows {
 				j++
@@ -64,13 +64,10 @@ func convert(s string, numRows int) string {
 			if rn == 0 {
 				rn = numRows - 2
 			}
-			equo[rn][j] = e
+			equo[rn] = append(equo[rn], e)
 			j++
 
 			rn--
-			if rn <= 0 {
-				rn = 0
-			}
 
 			cn++
 			if cn >= numRows-1 {
