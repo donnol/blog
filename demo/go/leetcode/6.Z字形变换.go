@@ -38,6 +38,41 @@ import "fmt"
 // 1 <= s.length <= 1000
 // s 由英文字母（小写和大写）、',' 和 '.' 组成
 // 1 <= numRows <= 1000
+func convert2(s string, numRows int) string {
+	interval := numRows*2 - 2
+	if interval == 0 {
+		return s
+	}
+
+	bs := make([]byte, 0, len(s))
+	for j := 0; j < numRows; j++ {
+		intv := interval - j*2
+		if intv == 0 {
+			intv = interval
+		}
+		intv2 := interval - intv
+
+		n := 0
+		for i := j; i < len(s); {
+			bs = append(bs, s[i])
+
+			if intv2 != 0 {
+				if n%2 == 0 {
+					i += intv
+				} else {
+					i += intv2
+				}
+			} else {
+				i += intv
+			}
+
+			n++
+		}
+	}
+
+	return string(bs)
+}
+
 func convert(s string, numRows int) string {
 	r := ""
 
