@@ -23,14 +23,29 @@ package leetcode
 // 0 <= height[i] <= 104
 func maxArea(height []int) int {
 	r := 0
-	for i, v := range height {
-		for j := i + 1; j < len(height); j++ {
-			lv := height[j]
-			m := min(v, lv)
-			area := m * (j - i)
-			if r < area {
-				r = area
-			}
+
+	// 双指针
+	i, j := 0, len(height)-1
+	for {
+		fe, le := height[i], height[j]
+
+		// 计算面积
+		m := min(fe, le)
+		area := m * (j - i)
+		if area > r {
+			r = area
+		}
+
+		// 移动指针
+		switch m {
+		case fe:
+			i++
+		case le:
+			j--
+		}
+
+		if i == j {
+			break
 		}
 	}
 	return r
