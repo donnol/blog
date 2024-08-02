@@ -54,11 +54,17 @@ func intToRoman(num int) string {
 		mod := num % 10
 		p10 := pow10(i)
 		e := mod * p10
-		big, small := baseByNum(e)
+		big, mid, small := baseByNum(e)
+		_ = mid
 		switch mod {
 		case 4, 9:
 			r = small + big + r
 		default:
+			n := 0
+			if mod < 4 {
+				n = mod
+			}
+			r = mid + repeat(small, n) + r
 		}
 
 		i++
@@ -78,25 +84,28 @@ func intToRoman(num int) string {
 // C	100
 // D	500
 // M	1000
-func baseByNum(num int) (big string, small string) {
+func baseByNum(num int) (big, mid, small string) {
 	switch {
 	case num <= 5:
 		big = "V"
 		small = "I"
 	case num <= 10:
 		big = "X"
+		mid = "V"
 		small = "I"
 	case num <= 50:
 		big = "L"
 		small = "X"
 	case num <= 100:
 		big = "C"
+		mid = "L"
 		small = "X"
 	case num <= 500:
 		big = "D"
 		small = "C"
 	case num <= 1000:
 		big = "M"
+		mid = "D"
 		small = "C"
 	}
 	return
@@ -106,6 +115,14 @@ func pow10(n int) int {
 	r := 1
 	for i := 1; i <= n; i++ {
 		r *= 10
+	}
+	return r
+}
+
+func repeat(s string, n int) string {
+	r := ""
+	for i := 0; i < n; i++ {
+		r += s
 	}
 	return r
 }
