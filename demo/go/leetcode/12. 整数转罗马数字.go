@@ -52,19 +52,22 @@ func intToRoman(num int) string {
 	i := 0
 	for {
 		mod := num % 10
-		p10 := pow10(i)
+		p10 := binPow(10, i)
 		e := mod * p10
 		big, mid, small := baseByNum(e)
-		_ = mid
 		switch mod {
 		case 4, 9:
 			r = small + big + r
 		default:
-			n := 0
-			if mod < 4 {
-				n = mod
+			if mid != "" {
+				r = mid + repeat(small, times(mod)) + r
+			} else {
+				c := big
+				if mod < 5 {
+					c = small
+				}
+				r = repeat(c, times(mod)) + r
 			}
-			r = mid + repeat(small, n) + r
 		}
 
 		i++
@@ -86,37 +89,62 @@ func intToRoman(num int) string {
 // M	1000
 func baseByNum(num int) (big, mid, small string) {
 	switch {
-	case num <= 5:
+	case num == 1:
+		big = "I"
+		small = "I"
+	case num < 5:
 		big = "V"
 		small = "I"
-	case num <= 10:
+	case num == 5:
+		big = "V"
+		small = "V"
+	case num < 10:
 		big = "X"
 		mid = "V"
 		small = "I"
-	case num <= 50:
+	case num == 10:
+		big = "X"
+		small = "X"
+	case num < 50:
 		big = "L"
 		small = "X"
-	case num <= 100:
+	case num == 50:
+		big = "L"
+		small = "L"
+	case num < 100:
 		big = "C"
 		mid = "L"
 		small = "X"
-	case num <= 500:
+	case num == 100:
+		big = "C"
+		small = "C"
+	case num < 500:
 		big = "D"
 		small = "C"
-	case num <= 1000:
+	case num == 500:
+		big = "D"
+		small = "D"
+	case num < 1000:
 		big = "M"
 		mid = "D"
 		small = "C"
+	default:
+		big = "M"
+		small = "M"
 	}
 	return
 }
 
-func pow10(n int) int {
-	r := 1
-	for i := 1; i <= n; i++ {
-		r *= 10
+func binPow(a, b int) int {
+	res := 1
+	for b > 0 {
+		if b&1 != 0 {
+			res = res * a
+		}
+		a = a * a
+		b >>= 1
 	}
-	return r
+	return res
 }
 
 func repeat(s string, n int) string {
@@ -125,4 +153,18 @@ func repeat(s string, n int) string {
 		r += s
 	}
 	return r
+}
+
+func times(mod int) int {
+	n := 0
+	if mod == 5 {
+		return 1
+	}
+	if mod > 0 && mod < 4 {
+		n = mod
+	}
+	if mod > 5 && mod < 9 {
+		n = mod - 5
+	}
+	return n
 }
