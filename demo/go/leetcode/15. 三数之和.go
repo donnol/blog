@@ -41,7 +41,7 @@ func threeSum(nums []int) [][]int {
 	// 双指针
 	for i := 0; i < l; i++ {
 		a := nums[i]
-		if i > 0 && a == nums[i-1] {
+		if i > 0 && a == nums[i-1] { // 排序之后，如果有连续相同的值，直接跳过
 			continue
 		}
 
@@ -49,16 +49,17 @@ func threeSum(nums []int) [][]int {
 		target := -1 * a
 
 		for j := i + 1; j < l; j++ {
-			if j > i+1 && nums[j] == nums[j-1] {
+			if j > i+1 && nums[j] == nums[j-1] { // 排序之后，如果有连续相同的值，直接跳过
 				continue
 			}
 
-			for j < k && nums[j]+nums[k] > target {
+			for j < k && nums[j]+nums[k] > target { // 比目标值大的情况下往前挪动`k`指针
 				k--
 			}
-			if j == k {
+			if j == k { // 如果挪动到一样了还是大于目标值，说明找不到符合条件的值，直接跳出
 				break
 			}
+
 			if nums[j]+nums[k] == target {
 				r = append(r, []int{a, nums[j], nums[k]})
 			}
