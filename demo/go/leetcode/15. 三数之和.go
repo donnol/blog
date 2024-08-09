@@ -1,7 +1,6 @@
 package leetcode
 
 import (
-	"fmt"
 	"sort"
 )
 
@@ -35,24 +34,33 @@ import (
 func threeSum(nums []int) [][]int {
 	l := len(nums)
 	r := make([][]int, 0, l/2)
-	seen := make(map[string]struct{})
-	for i := 0; i < l; i++ {
-		for j := i + 1; j < l; j++ {
-			for k := j + 1; k < l; k++ {
-				a := nums[i]
-				b := nums[j]
-				c := nums[k]
 
-				if a+b+c == 0 {
-					s := []int{a, b, c}
-					sort.Ints(s)
-					key := fmt.Sprintf("%d|%d|%d", s[0], s[1], s[2])
-					_, ok := seen[key]
-					if !ok {
-						r = append(r, s)
-						seen[key] = struct{}{}
-					}
-				}
+	// 有序
+	sort.Ints(nums)
+
+	// 双指针
+	for i := 0; i < l; i++ {
+		a := nums[i]
+		if i > 0 && a == nums[i-1] {
+			continue
+		}
+
+		k := l - 1
+		target := -1 * a
+
+		for j := i + 1; j < l; j++ {
+			if j > i+1 && nums[j] == nums[j-1] {
+				continue
+			}
+
+			for j < k && nums[j]+nums[k] > target {
+				k--
+			}
+			if j == k {
+				break
+			}
+			if nums[j]+nums[k] == target {
+				r = append(r, []int{a, nums[j], nums[k]})
 			}
 		}
 
