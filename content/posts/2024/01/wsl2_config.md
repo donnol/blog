@@ -52,12 +52,14 @@ TEMP_FILE_PATH=${TEMP_DIR_PATH}'/dns_back'
 
 # inetIp=`ifconfig eth0 | grep -o "inet [0-9]*\.[0-9]*\.[0-9]*\.[0-9]* netmask" | cut -f 2 -d " "` # 获取本机ip
 inetIp=`ip a | grep eth0 | grep -o "inet [0-9]*\.[0-9]*\.[0-9]*\.[0-9]*" | cut -f 2 -d " "`
+hnetIp=`ip route show | grep -i default | awk '{ print $3}'`
 
 nu=`cat -n ${HOSTS_FILE_WIN} | grep localwsl2 | awk '{print $1}'` # 获取已设置dns行号
 
 dnsIp=`cat ${HOSTS_FILE_WIN} | grep -o "[0-9]*\.[0-9]*\.[0-9]*\.[0-9]* localwsl2 #" | cut -f 1 -d " "` # 获取已设置dns ip 
 
 echo "wsl's ip is: ${inetIp}"
+echo "wsl host's ip is: ${hnetIp}"
 echo "win's dns line number is: ${nu}"
 echo "win's dnsIp is: ${dnsIp}"
 
@@ -86,6 +88,7 @@ then
 else # 未设置
         echo "will append localwsl2 ip:host to windows hosts"
         echo "${inetIp} localwsl2 #wsl2 dns config" >> ${HOSTS_FILE_WIN} # 直接设置
+        echo "${hnetIp} winhost #wsl2 dns config" >> ${HOSTS_FILE_WIN} # 直接设置， ip route show | grep -i default | awk '{ print $3}' [拿到主机地址](https://learn.microsoft.com/en-us/windows/wsl/networking)
         echo "finish append localwsl2 ip:host to windows hosts"
 fi
 ```
