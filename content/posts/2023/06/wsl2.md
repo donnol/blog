@@ -63,3 +63,49 @@ Windows version: 10.0.19045.3031
     而如果先在wsl2里起了服务，再在主机起服务（绑定相同端口: 14222），则会报错端口已被绑定。
 
     但是，如果在wsl2里先起的mysql服务，再在主机起，则不会报错，所以还跟端口值有关？
+
+### 最新发现
+
+如何通过局域网访问WSL2中的服务？
+
+假设局域网上有两台主机A和B。主机A安装了WSL2、开启了Redis服务，端口为6379。现在主机B如何才能访问主机A上WSL2的Redis服务呢?
+
+1. 配置端口转发
+
+1). 以管理员权限打开PS，输入命令：
+
+```sh
+# listenaddress： 监听地址， 0.0.0.0 表示匹配所有地址。
+# listenport：监听的Windows端口。
+# connectaddress：要转发的地址。-- 这里设置为 localhost, 是因为我们可以通过 localhost 来访问WSL2。
+# connectport： 转发的WSL2端口。
+netsh interface portproxy add v4tov4 listenaddress=0.0.0.0 listenport=6379 connectaddress=localhost connectport=6379
+```
+
+2). 通过以下命令，查看当前所有的转发设置。
+
+```sh
+netsh interface portproxy show all
+```
+
+也可以通过以下命令来删除转发设置：
+
+```sh
+netsh interface portproxy delete v4tov4 listenaddress=0.0.0.0 listenport=6379
+```
+
+2. 防火墙配置入站规则
+
+防火墙->防火墙和网络保护->高级设置->入站规则->新建规则->填写允许通过的端口完成添加
+
+### 最后
+
+WSL2启动服务后，本机可以直接使用`localhost:6379`访问到该服务，但是用`127.0.0.1:6379`不行。
+
+而做完以上`netsh`转发操作后，本机访问`127.0.0.1:6379`时报错：`ERR_EMPTY_RESPONSE`，与期望的结果不符，这是为什么呢？
+
+[WSL2网络配置的讨论](https://github.com/microsoft/WSL/issues/4150)
+
+WSL2 2.0新增实验配置：`networkingMode=mirrored`
+
+[WSL2 和 Windows 主机的网络互通而且 IP 地址相同了，还支持 IPv6 了，并且从外部（比如局域网）可以同时访问 WSL2 和 Windows 的网络。](https://www.v2ex.com/t/975098?p=2)
