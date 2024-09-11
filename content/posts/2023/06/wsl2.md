@@ -77,9 +77,9 @@ Windows version: 10.0.19045.3031
 ```sh
 # listenaddress： 监听地址， 0.0.0.0 表示匹配所有地址。
 # listenport：监听的Windows端口。
-# connectaddress：要转发的地址。-- 这里设置为 localhost, 是因为我们可以通过 localhost 来访问WSL2。
+# connectaddress：要转发的地址。-- 下面的`172.20.109.210`是`WSL2`的ip地址
 # connectport： 转发的WSL2端口。
-netsh interface portproxy add v4tov4 listenaddress=0.0.0.0 listenport=6379 connectaddress=localhost connectport=6379
+netsh interface portproxy add v4tov4 listenaddress=0.0.0.0 listenport=6379 connectaddress=172.20.109.210 connectport=6379
 ```
 
 2). 通过以下命令，查看当前所有的转发设置。
@@ -98,6 +98,8 @@ netsh interface portproxy delete v4tov4 listenaddress=0.0.0.0 listenport=6379
 
 防火墙->防火墙和网络保护->高级设置->入站规则->新建规则->填写允许通过的端口完成添加
 
+出站规则同上。
+
 ### 最后
 
 WSL2启动服务后，本机可以直接使用`localhost:6379`访问到该服务，但是用`127.0.0.1:6379`不行。
@@ -106,6 +108,8 @@ WSL2启动服务后，本机可以直接使用`localhost:6379`访问到该服务
 
 [WSL2网络配置的讨论](https://github.com/microsoft/WSL/issues/4150)
 
-WSL2 2.0新增实验配置：`networkingMode=mirrored`
+最后的最后，重启了电脑之后，突然就可以了。
+
+#### WSL2 2.0新增实验配置：`networkingMode=mirrored`，但是需要Win11才能用。
 
 [WSL2 和 Windows 主机的网络互通而且 IP 地址相同了，还支持 IPv6 了，并且从外部（比如局域网）可以同时访问 WSL2 和 Windows 的网络。](https://www.v2ex.com/t/975098?p=2)
