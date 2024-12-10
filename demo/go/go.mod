@@ -56,6 +56,7 @@ require (
 	github.com/donnol/do v1.10.0
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/traefik/yaegi v0.15.1
+	github.com/ying32/govcl v2.2.3+incompatible
 	golang.org/x/net v0.25.0 // indirect
 	golang.org/x/sys v0.20.0 // indirect
 	golang.org/x/text v0.15.0 // indirect

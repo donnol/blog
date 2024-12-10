@@ -8,3 +8,6 @@ target
 .vscode/
 # dlv debug.test
 debug.test
+
+demo/go/gui/govcl/govcl
+demo/go/gui/govcl/govcl.exe
